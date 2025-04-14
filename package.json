@@ -1,0 +1,26 @@
+{
+  "name": "2025-04-14-minigame-scroller",
+  "version": "0.1.0",
+  "description": "Shigumano inspired scroller JS minigame for practice",
+  "homepage": "https://github.com/g-broche/training-course-minigame-undersea-scroller#readme",
+  "bugs": {
+    "url": "https://github.com/g-broche/training-course-minigame-undersea-scroller/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/g-broche/training-course-minigame-undersea-scroller.git"
+  },
+  "license": "ISC",
+  "author": "g-broche",
+  "type": "commonjs",
+  "main": "main.js",
+  "scripts": {
+    "test": "jest",
+    "sass": "sass src/scss/style.scss style.css -w"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "jsdom": "^26.1.0",
+    "sass": "^1.86.3"
+  }
+}
