@@ -1,0 +1,15 @@
+@use "./abstract/" as *;
+@use "./elements/" as *;
+@use "./components/" as *;
+
+body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+}
+
+.hidden {
+    visibility: hidden;
+}

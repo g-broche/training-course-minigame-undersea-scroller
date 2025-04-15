@@ -1,3 +1,33 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
+.player {
+  position: absolute;
+  width: 4vw;
+  height: 2vw;
+  background-color: rgb(193, 60, 160);
+}
+
+#game-board {
+  position: relative;
+  height: 45vw;
+  width: 90vw;
+  background-color: #136b52;
+  background: linear-gradient(0deg, rgb(19, 107, 82) 0%, rgb(25, 141, 176) 25%, rgb(41, 165, 196) 49%, rgb(51, 193, 212) 75%, rgb(121, 228, 242) 100%);
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.hidden {
+  visibility: hidden;
+}
 
 /*# sourceMappingURL=style.css.map */
