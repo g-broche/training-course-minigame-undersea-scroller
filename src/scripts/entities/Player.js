@@ -1,4 +1,5 @@
 export class Player {
+    static #instance = null;
     /** @type {{ hitbox: HTMLDivElement|null, sprite: HTMLImageElement|null, healthBar: HTMLDivElement|null}} */
     domElement = {
         hitbox: null,
@@ -26,11 +27,22 @@ export class Player {
             left: null,
         }
     };
-    posY;
-    constructor({ moveSpeedX, moveSpeedY }) {
+    constructor() {
+        if (Player.#instance) {
+            return Player.#instance;
+        }
+        Player.#instance = this;
+    }
+    static getInstance() {
+        if (!Player.#instance) {
+            Player.#instance = new Player();
+        }
+        return Player.#instance;
+    }
+    setSpeed({ moveSpeedX, moveSpeedY }) {
         this.moveSpeed.x = moveSpeedX;
         this.moveSpeed.y = moveSpeedY;
-        console.log(this.positions)
+
     }
     createPlayerElement() {
         this.domElement.hitbox = document.createElement("div");
@@ -57,11 +69,9 @@ export class Player {
     setPosition({ posX, posY }) {
         this.positions.posX = posX;
         this.positions.posY = posY;
-        console.log(this.positions)
         this.setBoundaries()
     }
     setBoundaries() {
-        console.log(`$posY = ${this.positions.posY}, halfHeight = ${this.sizes.halfHeight}, top = ${this.positions.posY - this.sizes.halfHeight}`)
         this.positions.boundaries.top = this.positions.posY - this.sizes.halfHeight;
         this.positions.boundaries.right = this.positions.posX + this.sizes.halfWidth;
         this.positions.boundaries.bottom = this.positions.posY + this.sizes.halfHeight;
@@ -74,8 +84,32 @@ export class Player {
     getBoundaries() {
         return this.positions.boundaries
     }
-    move(moveX = 0, moveY = 0) {
-        this.posX += moveX;
-        this.posY -= moveY;
+    moveUp() {
+        if (this.positions.boundaries.top - this.moveSpeed.y < 0) {
+            return;
+        }
+        this.positions.posY -= this.moveSpeed.y;
+        this.setBoundaries()
+    }
+    moveRight(boardLimitRight) {
+        if (this.positions.boundaries.right + this.moveSpeed.x > boardLimitRight) {
+            return;
+        }
+        this.positions.posX += this.moveSpeed.x;
+        this.setBoundaries()
+    }
+    moveDown(boardLimitBottom) {
+        if (this.positions.boundaries.bottom + this.moveSpeed.y > boardLimitBottom) {
+            return;
+        }
+        this.positions.posY += this.moveSpeed.y;
+        this.setBoundaries()
+    }
+    moveLeft() {
+        if (this.positions.boundaries.left - this.moveSpeed.x < 0) {
+            return;
+        }
+        this.positions.posX -= this.moveSpeed.x;
+        this.setBoundaries()
     }
 }

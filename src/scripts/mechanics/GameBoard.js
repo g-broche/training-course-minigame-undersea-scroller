@@ -35,20 +35,32 @@ export class GameBoard {
         this.domElements.board = document.getElementById(boardId);
         this.sizes.height = this.domElements.board.offsetHeight;
         this.sizes.width = this.domElements.board.offsetHeight;
-        this.moveSpeedBase.x = this.sizes.height / 100;
-        this.moveSpeedBase.y = this.sizes.height / 200;
+        this.moveSpeedBase.x = this.sizes.height / 75;
+        this.moveSpeedBase.y = this.sizes.height / 150;
+    }
+    getBoundaries() {
+        return {
+            right: this.domElements.board.offsetWidth,
+            bottom: this.domElements.board.offsetHeight,
+        }
     }
     addPlayer() {
-        this.entities.player = new Player({
+        this.entities.player = Player.getInstance();
+        console.log(`get instance`, this.entities.player)
+        this.entities.player.setSpeed({
             moveSpeedX: this.moveSpeedBase.x,
             moveSpeedY: this.moveSpeedBase.y
-        });
+        })
+        console.log(`set speed`, this.entities.player)
         const playerElement = this.entities.player.createPlayerElement();
         this.entities.player.togglePlayerVisibility(false)
         this.domElements.board.append(playerElement);
         this.entities.player.setSize()
+        console.log(`set size`, this.entities.player)
         this.entities.player.setPosition({ posX: this.entities.player.sizes.halfWidth, posY: this.sizes.height / 2 });
+        console.log(`set position`, this.entities.player)
         this.entities.player.ActualizeDisplayLocation();
+        console.log(`actualize display`, this.entities.player)
         this.entities.player.togglePlayerVisibility(true)
     }
 }
