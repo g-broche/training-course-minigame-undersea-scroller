@@ -52,8 +52,8 @@ export class GameBoard {
             moveSpeedY: this.moveSpeedBase.y
         })
         console.log(`set speed`, this.entities.player)
-        const playerElement = this.entities.player.createPlayerElement();
-        this.entities.player.togglePlayerVisibility(false)
+        const playerElement = this.entities.player.createElement("player");
+        this.entities.player.toggleVisibility(false)
         this.domElements.board.append(playerElement);
         this.entities.player.setSize()
         console.log(`set size`, this.entities.player)
@@ -61,6 +61,6 @@ export class GameBoard {
         console.log(`set position`, this.entities.player)
         this.entities.player.ActualizeDisplayLocation();
         console.log(`actualize display`, this.entities.player)
-        this.entities.player.togglePlayerVisibility(true)
+        this.entities.player.toggleVisibility(true)
     }
 }
