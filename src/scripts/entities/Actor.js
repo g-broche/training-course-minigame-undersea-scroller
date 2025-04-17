@@ -67,5 +67,12 @@ export class Actor extends Movable {
             this.#shots.delete(id)
         }
     }
+    takeHit(damageReceived) {
+        this.#health -= damageReceived;
+        console.log(`${this.#health} HP remaining`)
+    }
+    isAlive() {
+        return this.#health > 0;
+    }
 
 }

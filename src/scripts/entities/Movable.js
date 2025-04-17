@@ -120,5 +120,10 @@ export class Movable {
      * @param {Movable} movable 
      */
     hasCollisionWith(movable) {
+        const isMatchingX = this.positions.boundaries.right > movable.positions.boundaries.left && this.positions.boundaries.left < movable.positions.boundaries.right;
+        const isMatchingY = this.positions.boundaries.bottom > movable.positions.boundaries.top && this.positions.boundaries.top < movable.positions.boundaries.bottom;
+        // console.log(`is matching on X ${isMatchingX}, is matching on Y ${isMatchingY}`)
+        const isColliding = isMatchingX && isMatchingY;
+        return isColliding;
     }
 }

@@ -37,7 +37,6 @@ export class Projectile extends Movable {
     }
 
     static createProjectile({ projectileClass, shooter, projectileDamage, projectileSpeedX, projectileSpeedY }) {
-        console.log("projectile inc", Projectile.projectileIncrementor)
         const projectile = {
             id: Projectile.projectileIncrementor,
             projectile: new Projectile(

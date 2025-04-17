@@ -24,7 +24,8 @@ export class GameBoard {
             yMax: null
         }
     }
-    moveSpeedBase = null
+    moveSpeedBase = null;
+    #enemiesToDespawn = new Set();
     constructor() {
         if (GameBoard.#instance) {
             return GameBoard.#instance;
@@ -91,7 +92,6 @@ export class GameBoard {
             this.domElements.board.append(newEnemyElement);
             newEnemy.enemy.setSize()
             const randomCoords = this.setRandomSpawnLocation()
-            console.log(randomCoords)
             newEnemy.enemy.setPosition(randomCoords);
             newEnemy.enemy.ActualizeDisplayLocation();
             newEnemy.enemy.toggleVisibility(true)
@@ -100,7 +100,26 @@ export class GameBoard {
             console.log(error)
         }
     }
-
+    addEnemyToDespawnList(enemyId) {
+        this.#enemiesToDespawn.add(enemyId)
+    }
+    delistDeadEnemies() {
+        for (const id of this.#enemiesToDespawn) {
+            this.enemies.delete(id)
+        }
+        this.#enemiesToDespawn.clear()
+    }
+    clearDeadEnemies() {
+        for (const enemyId of this.#enemiesToDespawn) {
+            let enemyToDelete = this.enemies.get(enemyId);
+            if (enemyToDelete) {
+                enemyToDelete.removeFromDom();
+                enemyToDelete = null
+                this.enemies.delete(enemyId)
+            }
+            this.#enemiesToDespawn.clear()
+        }
+    }
     isOutOfBounds(movable) {
         return movable.positions.boundaries.top > this.sizes.height
             || movable.positions.boundaries.left > this.sizes.width

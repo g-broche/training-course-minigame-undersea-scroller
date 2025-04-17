@@ -27,7 +27,6 @@ export class App {
         return App.#instance;
     }
     reloadNextSpawn() {
-        console.log(this.framesUntilNextSpawn)
         if (this.framesUntilNextSpawn === 0) {
             return
         }
@@ -108,12 +107,22 @@ export class App {
         for (let [projectileId, projectile] of this.player.getShots()) {
             projectile.move();
             projectile.ActualizeDisplayLocation();
+            for (let [enemyId, enemy] of this.gameBoard.enemies) {
+                if (projectile.hasCollisionWith(enemy)) {
+                    enemy.takeHit(projectile.damage)
+                    this.queueProjectileForDeletion({ projectileId: projectileId, projectile: projectile })
+                    if (!enemy.isAlive()) {
+                        console.log("enemy is dead")
+                        this.gameBoard.addEnemyToDespawnList(enemyId)
+                    }
+                    break;
+                }
+            }
             if (this.gameBoard.isOutOfBounds(projectile)) {
-                projectile.removeFromDom();
-                projectile = null;
-                this.player.addShotsToDespawner(projectileId);
+                this.queueProjectileForDeletion({ projectileId: projectileId, projectile: projectile })
             }
         }
+        this.gameBoard.clearDeadEnemies()
         this.player.despawnExpiredShots()
         if (this.framesUntilNextSpawn === 0) {
             this.gameBoard.addEnemyAtRandom();
@@ -123,5 +132,10 @@ export class App {
         if (!this.isPaused) {
             window.requestAnimationFrame(() => { this.playFrame() });
         }
+    }
+    queueProjectileForDeletion({ projectileId, projectile }) {
+        projectile.removeFromDom();
+        projectile.owner.addShotsToDespawner(projectileId);
+        projectile = null;
     }
 }
