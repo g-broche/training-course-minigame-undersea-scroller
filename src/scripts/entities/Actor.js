@@ -1,5 +1,3 @@
-import { ProjectileFactory } from "../factories/ProjectileFactory.js";
-import { GameBoard } from "../mechanics/GameBoard.js";
 import { Movable } from "./Movable.js";
 import { Projectile } from "./Projectile.js";
 
@@ -10,13 +8,11 @@ export class Actor extends Movable {
     #shotVelocityFactor;
     isAbleToFire = true;
     rateOfFire = 40;
+    framesUntilNextShot = 0;
     #shots = new Map();
     #shotsToDespawn = new Set();
-    /** @type {ProjectileFactory|null} */
-    projectileFactory = null;
-    constructor({ baseClass, health, atkDamage, shotVelocityFactor, projectileClass }, projectileFactory = ProjectileFactory.getInstance()) {
+    constructor({ baseClass, health, atkDamage, shotVelocityFactor, projectileClass }) {
         super(baseClass);
-        this.projectileFactory = projectileFactory;
         this.#health = health;
         this.#atkDamage = atkDamage;
         this.#projectileClass = projectileClass;
@@ -27,7 +23,7 @@ export class Actor extends Movable {
      * 
      * @param {{deltaX: Number, deltaY: Number}} deltaCoordsToTarget 
      */
-    fireProjectile(deltaCoordsToTarget = null) {
+    fireProjectile(gameBoard, deltaCoordsToTarget = null) {
         if (!this.isAbleToFire) {
             return;
         }
@@ -35,7 +31,7 @@ export class Actor extends Movable {
             this.#shotVelocityFactor,
             deltaCoordsToTarget
         )
-        const projectileData = this.projectileFactory.createProjectile({
+        const projectileData = Projectile.createProjectile({
             projectileClass: this.#projectileClass,
             shooter: this,
             projectileDamage: this.#atkDamage,
@@ -43,14 +39,22 @@ export class Actor extends Movable {
             projectileSpeedY: projectileVector.moveSpeedY,
         });
         this.#shots.set(projectileData.id, projectileData.projectile);
-        projectileData.projectile.placeAtOrigin();
+        projectileData.projectile.placeAtOrigin(gameBoard);
         this.isAbleToFire = false;
-        setTimeout(() => {
-            this.isAbleToFire = true;
-        }, this.getDelayBetweenShots())
+        this.framesUntilNextShot = this.rateOfFire
     }
-    getDelayBetweenShots() {
-        return this.rateOfFire / 60 * 1000
+    reloadNextShot() {
+        if (this.isAbleToFire) {
+            return
+        }
+        if (this.framesUntilNextShot <= 0) {
+            this.isAbleToFire = true
+            return
+        }
+        if (this.framesUntilNextShot > 0) {
+            this.framesUntilNextShot--
+            return;
+        }
     }
     getShots() {
         return this.#shots;

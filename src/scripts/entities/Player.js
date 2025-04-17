@@ -27,6 +27,4 @@ export class Player extends Actor {
         }
         return Player.#instance;
     }
-
-
 }

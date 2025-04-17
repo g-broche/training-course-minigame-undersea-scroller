@@ -11,11 +11,25 @@
   background-color: rgb(193, 60, 160);
 }
 
+.enemy {
+  position: absolute;
+  width: 4vw;
+  height: 4vw;
+  background-color: rgb(110, 16, 86);
+}
+
 .projectile {
   position: absolute;
 }
 
 .shigu-attack {
+  border-radius: 50%;
+  width: 1.5vw;
+  height: 1.5vw;
+  background-color: lightblue;
+}
+
+.enemy-attack {
   border-radius: 50%;
   width: 1.5vw;
   height: 1.5vw;

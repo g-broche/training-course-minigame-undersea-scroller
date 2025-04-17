@@ -1,14 +1,13 @@
-import { GameBoard } from "../mechanics/GameBoard.js";
 import { Movable } from "./Movable.js";
 
 export class Projectile extends Movable {
+    static baseProjectileVelocity;
+    static projectileIncrementor = 1;
     damage;
     /** @type {Movable} */
     owner = null;
     isFromPlayer = false
-    /** @type {GameBoard} */
-    gameBoard = null
-    constructor({ baseClass, owner, damage = 10, speedX, speedY }, gameBoard = GameBoard.getInstance()) {
+    constructor({ baseClass, owner, damage = 10, speedX, speedY }) {
         super(`projectile ${baseClass}`);
         this.owner = owner;
         this.isFromPlayer = owner.constructor.name === "Player";
@@ -17,16 +16,18 @@ export class Projectile extends Movable {
             moveSpeedX: speedX,
             moveSpeedY: speedY
         });
-        this.gameBoard = gameBoard;
+    }
+    static setBaseProjectileVelocity(newVelocity) {
+        Projectile.baseProjectileVelocity = newVelocity
     }
     /**
      * 
      * @param {Number} shotVelocityFactor 
      * @param {{deltaX: Number, deltaY: Number}} deltaCoordsToTarget 
      */
-    static calculateShotSpeedFromVelocityFactor(shotVelocityFactor, deltaCoordsToTarget = null, gameBoard = GameBoard.getInstance()) {
+    static calculateShotSpeedFromVelocityFactor(shotVelocityFactor, deltaCoordsToTarget = null) {
         if (!deltaCoordsToTarget) {
-            const moveSpeedX = shotVelocityFactor * gameBoard.moveSpeedBase
+            const moveSpeedX = shotVelocityFactor * Projectile.baseProjectileVelocity
             const moveSpeedY = 0
             return {
                 moveSpeedX: moveSpeedX,
@@ -35,10 +36,32 @@ export class Projectile extends Movable {
         }
     }
 
-    placeAtOrigin() {
+    static createProjectile({ projectileClass, shooter, projectileDamage, projectileSpeedX, projectileSpeedY }) {
+        console.log("projectile inc", Projectile.projectileIncrementor)
+        const projectile = {
+            id: Projectile.projectileIncrementor,
+            projectile: new Projectile(
+                {
+                    baseClass: projectileClass,
+                    owner: shooter,
+                    damage: projectileDamage,
+                    speedX: projectileSpeedX,
+                    speedY: projectileSpeedY
+                }
+            )
+        };
+        Projectile.projectileIncrementor++;
+        return projectile;
+    }
+
+    /**
+     * 
+     * @param {*} gameBoard 
+     */
+    placeAtOrigin(gameBoard) {
         this.createElement();
         this.toggleVisibility(false)
-        this.gameBoard.domElements.board.appendChild(this.domElement.hitbox)
+        gameBoard.domElements.board.appendChild(this.domElement.hitbox)
         this.setSize()
         const originX = this.isFromPlayer
             ? this.owner.positions.boundaries.right + this.sizes.halfWidth

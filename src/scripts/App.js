@@ -1,13 +1,10 @@
 import { Player } from "./entities/Player.js";
-import { ProjectileFactory } from "./factories/ProjectileFactory.js";
 import { Controller } from "./mechanics/Controller.js";
 import { InitializationError } from "./mechanics/Errors.js";
 import { GameBoard } from "./mechanics/GameBoard.js"
 
 export class App {
     static #instance = null;
-    /** @type { ProjectileFactory } */
-    projectileFactory = null;
     /** @type { GameBoard } */
     gameBoard = null;
     /** @type { Controller } */
@@ -15,6 +12,8 @@ export class App {
     /** @type { Player } */
     player = null;
     isPaused = false;
+    delayBetweenSpawns = 5;
+    framesUntilNextSpawn = 0;
     constructor() {
         if (App.#instance) {
             return App.#instance;
@@ -27,13 +26,22 @@ export class App {
         }
         return App.#instance;
     }
+    reloadNextSpawn() {
+        console.log(this.framesUntilNextSpawn)
+        if (this.framesUntilNextSpawn === 0) {
+            return
+        }
+        if (this.framesUntilNextSpawn > 0) {
+            this.framesUntilNextSpawn--
+            return;
+        }
+    }
     consumeActions() {
         for (const action of this.controller.getActionsToExecute()) {
             this.handleAction(action);
         }
         this.player.ActualizeDisplayLocation();
     }
-
     handleAction(action) {
         switch (action) {
             case "moveUp":
@@ -49,7 +57,7 @@ export class App {
                 this.player.moveLeft();
                 break;
             case "fire":
-                this.player.fireProjectile();
+                this.player.fireProjectile(this.gameBoard);
                 break;
 
             default:
@@ -59,7 +67,6 @@ export class App {
     run() {
         console.log("App has started");
         try {
-            this.projectileFactory = ProjectileFactory.getInstance();
             this.gameBoard = GameBoard.getInstance();
             this.gameBoard.initialize("game-board");
             this.controller = Controller.getInstance();
@@ -95,17 +102,24 @@ export class App {
         this.playFrame();
     }
     playFrame() {
+        this.reloadNextSpawn();
+        this.player.reloadNextShot();
         this.consumeActions();
-        for (let [projectileId, projectile] of this.gameBoard.entities.player.getShots()) {
+        for (let [projectileId, projectile] of this.player.getShots()) {
             projectile.move();
             projectile.ActualizeDisplayLocation();
-            if (projectile.isOutOfBounds()) {
+            if (this.gameBoard.isOutOfBounds(projectile)) {
                 projectile.removeFromDom();
                 projectile = null;
                 this.player.addShotsToDespawner(projectileId);
             }
         }
         this.player.despawnExpiredShots()
+        if (this.framesUntilNextSpawn === 0) {
+            this.gameBoard.addEnemyAtRandom();
+            this.framesUntilNextSpawn = this.delayBetweenSpawns * 60;
+        }
+
         if (!this.isPaused) {
             window.requestAnimationFrame(() => { this.playFrame() });
         }

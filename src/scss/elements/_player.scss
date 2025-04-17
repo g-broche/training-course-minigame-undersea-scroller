@@ -1,9 +1,9 @@
 @use "../abstract/" as *;
-$placeHolderColor: rgb(193, 60, 160);
+$placeholder-player-color: rgb(193, 60, 160);
 
 .player {
     position: absolute;
     width: $player-hitbox-width;
     height: $player-hitbox-height;
-    background-color: $placeHolderColor;
+    background-color: $placeholder-player-color;
 }

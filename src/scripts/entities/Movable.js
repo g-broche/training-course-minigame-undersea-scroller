@@ -1,4 +1,5 @@
 export class Movable {
+    static baseMoveSpeed;
     /** @type {{ hitbox: HTMLDivElement|null, sprite: HTMLImageElement|null}} */
     domElement = {
         hitbox: null,
@@ -27,6 +28,9 @@ export class Movable {
     }
     constructor(baseClass) {
         this.#baseClass = baseClass;
+    }
+    static setBaseMoveSpeed(newMoveSpeed) {
+        Movable.baseMoveSpeed = newMoveSpeed
     }
     setSpeed({ moveSpeedX, moveSpeedY }) {
         this.moveSpeed.x = moveSpeedX;
@@ -109,13 +113,6 @@ export class Movable {
 
     removeFromDom() {
         this.domElement.hitbox.remove()
-    }
-
-    isOutOfBounds() {
-        return this.positions.boundaries.top > this.gameBoard.sizes.height
-            || this.positions.boundaries.left > this.gameBoard.sizes.width
-            || this.positions.boundaries.bottom < 0
-            || this.positions.boundaries.right < 0
     }
 
     /**

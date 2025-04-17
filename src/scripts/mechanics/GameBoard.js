@@ -1,4 +1,7 @@
+import { BaseEnemy } from "../entities/BaseEnemy.js";
+import { Movable } from "../entities/Movable.js";
 import { Player } from "../entities/Player.js";
+import { Projectile } from "../entities/Projectile.js";
 
 export class GameBoard {
     static #instance = null
@@ -6,14 +9,20 @@ export class GameBoard {
     domElements = {
         board: null
     };
-    /** @type {{ player: Player|null, enemies: any[] }} */
-    entities = {
-        player: null,
-        enemies: []
-    }
+    /** @type { Player } */
+    player = null
+    enemies = new Map();
     sizes = {
         height: null,
         width: null,
+    }
+    spawnArea = {
+        enemy: {
+            xMin: null,
+            xMax: null,
+            yMin: null,
+            yMax: null
+        }
     }
     moveSpeedBase = null
     constructor() {
@@ -32,7 +41,10 @@ export class GameBoard {
         this.domElements.board = document.getElementById(boardId);
         this.sizes.height = this.domElements.board.offsetHeight;
         this.sizes.width = this.domElements.board.offsetWidth;
+        this.setAllowedEnemySpawnArea()
         this.moveSpeedBase = this.sizes.width / 300;
+        Projectile.setBaseProjectileVelocity(this.moveSpeedBase * 1.25)
+        Movable.setBaseMoveSpeed(this.moveSpeedBase);
     }
     getBoundaries() {
         return {
@@ -41,17 +53,58 @@ export class GameBoard {
         }
     }
     addPlayer() {
-        this.entities.player = Player.getInstance();
-        this.entities.player.setSpeed({
+        this.player = Player.getInstance();
+        this.player.setSpeed({
             moveSpeedX: this.moveSpeedBase,
             moveSpeedY: this.moveSpeedBase / 2
         })
-        const playerElement = this.entities.player.createElement();
-        this.entities.player.toggleVisibility(false)
+        const playerElement = this.player.createElement();
+        this.player.toggleVisibility(false)
         this.domElements.board.append(playerElement);
-        this.entities.player.setSize()
-        this.entities.player.setPosition({ posX: this.entities.player.sizes.halfWidth, posY: this.sizes.height / 2 });
-        this.entities.player.ActualizeDisplayLocation();
-        this.entities.player.toggleVisibility(true)
+        this.player.setSize()
+        this.player.setPosition({ posX: this.player.sizes.halfWidth, posY: this.sizes.height / 2 });
+        this.player.ActualizeDisplayLocation();
+        this.player.toggleVisibility(true)
+    }
+    setAllowedEnemySpawnArea() {
+        this.spawnArea.enemy.xMin = this.sizes.width * 0.6;
+        this.spawnArea.enemy.xMax = this.sizes.width * 0.95;
+        this.spawnArea.enemy.yMax = this.sizes.height * 0.90;
+        this.spawnArea.enemy.yMin = this.sizes.height * 0.10;
+    }
+    setRandomSpawnLocation() {
+        return {
+            posX: Math.random() * (this.spawnArea.enemy.xMax - this.spawnArea.enemy.xMin) + this.spawnArea.enemy.xMin,
+            posY: Math.random() * (this.spawnArea.enemy.yMax - this.spawnArea.enemy.yMin) + this.spawnArea.enemy.yMin
+        }
+    }
+    addEnemyAtRandom() {
+        try {
+            const newEnemy = BaseEnemy.createBaseEnemy()
+            this.enemies.set(newEnemy.id, newEnemy.enemy)
+            newEnemy.enemy.setSpeed({
+                moveSpeedX: this.moveSpeedBase,
+                moveSpeedY: this.moveSpeedBase / 2
+            })
+            const newEnemyElement = newEnemy.enemy.createElement()
+            newEnemy.enemy.toggleVisibility(false)
+            this.domElements.board.append(newEnemyElement);
+            newEnemy.enemy.setSize()
+            const randomCoords = this.setRandomSpawnLocation()
+            console.log(randomCoords)
+            newEnemy.enemy.setPosition(randomCoords);
+            newEnemy.enemy.ActualizeDisplayLocation();
+            newEnemy.enemy.toggleVisibility(true)
+
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    isOutOfBounds(movable) {
+        return movable.positions.boundaries.top > this.sizes.height
+            || movable.positions.boundaries.left > this.sizes.width
+            || movable.positions.boundaries.bottom < 0
+            || movable.positions.boundaries.right < 0
     }
 }
