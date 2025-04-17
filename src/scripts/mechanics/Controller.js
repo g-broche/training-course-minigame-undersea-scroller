@@ -6,7 +6,6 @@ export class Controller {
         { action: "moveLeft", keys: new Set(["KeyQ", "ArrowLeft"]) },
         { action: "moveRight", keys: new Set(["KeyD", "ArrowRight"]) },
         { action: "fire", keys: new Set(["Space", "Enter"]) },
-        { action: "pause", keys: new Set(["KeyP"]) },
     ]
     #inputedKeyCodes = new Set();
     constructor() {

@@ -1,10 +1,13 @@
 import { Player } from "./entities/Player.js";
+import { ProjectileFactory } from "./factories/ProjectileFactory.js";
 import { Controller } from "./mechanics/Controller.js";
 import { InitializationError } from "./mechanics/Errors.js";
 import { GameBoard } from "./mechanics/GameBoard.js"
 
 export class App {
     static #instance = null;
+    /** @type { ProjectileFactory } */
+    projectileFactory = null;
     /** @type { GameBoard } */
     gameBoard = null;
     /** @type { Controller } */
@@ -46,11 +49,7 @@ export class App {
                 this.player.moveLeft();
                 break;
             case "fire":
-                console.log("firing");
-                break;
-            case "pause":
-                this.isPaused = !this.isPaused
-                console.log(`${this.isPaused ? "game has been paused" : "game has resumed"}`);
+                this.player.fireProjectile();
                 break;
 
             default:
@@ -60,6 +59,7 @@ export class App {
     run() {
         console.log("App has started");
         try {
+            this.projectileFactory = ProjectileFactory.getInstance();
             this.gameBoard = GameBoard.getInstance();
             this.gameBoard.initialize("game-board");
             this.controller = Controller.getInstance();
@@ -78,17 +78,34 @@ export class App {
             throw new InitializationError("Controller has not been initialized when starting new round");
         }
         window.addEventListener("keydown", (e) => {
-            console.log(e.code)
-            this.controller.addInput(e.code)
+            if (e.code === "KeyP") {
+                this.isPaused = !this.isPaused;
+                if (!this.isPaused) {
+                    this.playFrame();
+                }
+                console.log(`${this.isPaused ? "game has been paused" : "game has resumed"}`);
+                return;
+            }
+            this.controller.addInput(e.code);
         })
         window.addEventListener("keyup", (e) => {
-            this.controller.removeInput(e.code)
+            this.controller.removeInput(e.code);
         })
-        this.gameBoard.addPlayer()
-        this.playFrame()
+        this.gameBoard.addPlayer();
+        this.playFrame();
     }
     playFrame() {
-        this.consumeActions()
+        this.consumeActions();
+        for (let [projectileId, projectile] of this.gameBoard.entities.player.getShots()) {
+            projectile.move();
+            projectile.ActualizeDisplayLocation();
+            if (projectile.isOutOfBounds()) {
+                projectile.removeFromDom();
+                projectile = null;
+                this.player.addShotsToDespawner(projectileId);
+            }
+        }
+        this.player.despawnExpiredShots()
         if (!this.isPaused) {
             window.requestAnimationFrame(() => { this.playFrame() });
         }

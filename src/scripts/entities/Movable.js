@@ -14,6 +14,7 @@ export class Movable {
         x: null,
         y: null
     };
+    #baseClass = null
     positions = {
         posX: null,
         posY: null,
@@ -24,17 +25,26 @@ export class Movable {
             left: null,
         }
     }
+    constructor(baseClass) {
+        this.#baseClass = baseClass;
+    }
     setSpeed({ moveSpeedX, moveSpeedY }) {
         this.moveSpeed.x = moveSpeedX;
         this.moveSpeed.y = moveSpeedY;
     }
-    createElement(className = "") {
+    createElement() {
         this.domElement.hitbox = document.createElement("div");
-        this.domElement.hitbox.className = className;
+        this.domElement.hitbox.className = this.#baseClass;
         return this.domElement.hitbox;
     }
     removeElement() {
         this.domElement.hitbox.remove();
+    }
+    addClasses(classNames = []) {
+        this.domElement.hitbox.classList.add(...classNames);
+    }
+    removeClasses(classNames = []) {
+        this.domElement.hitbox.classList.remove(...classNames);
     }
     setSize() {
         const rect = this.domElement.hitbox.getBoundingClientRect();
@@ -96,11 +106,22 @@ export class Movable {
         }
         this.domElement.hitbox.classList.add("hidden")
     }
+
+    removeFromDom() {
+        this.domElement.hitbox.remove()
+    }
+
+    isOutOfBounds() {
+        return this.positions.boundaries.top > this.gameBoard.sizes.height
+            || this.positions.boundaries.left > this.gameBoard.sizes.width
+            || this.positions.boundaries.bottom < 0
+            || this.positions.boundaries.right < 0
+    }
+
     /**
      * 
      * @param {Movable} movable 
      */
     hasCollisionWith(movable) {
-
     }
 }
