@@ -4,12 +4,15 @@ const ENEMY_CLASS = "enemy";
 const BASE_HEALTH = 100;
 const ATK_DAMAGE = 30;
 const RATE_OF_FIRE = 20;
+const POINT_VALUE = 50;
 const SHOT_VELOCITY_FACTOR = 1.2;
 const PROJECTILE_CLASS = "enemy-attack";
 const AIMED_PROJECTILE_CLASS = "enemy-attack aimed-attack";
 
 export class BaseEnemy extends Actor {
     static enemyIncrementor = 1;
+    #pointValue;
+    aimedProjectileClass;
     get isFromPlayer() {
         return false;
     }
@@ -22,6 +25,8 @@ export class BaseEnemy extends Actor {
             projectileClass: PROJECTILE_CLASS,
             rateOfFire: RATE_OF_FIRE
         });
+        this.#pointValue = POINT_VALUE;
+        this.aimedProjectileClass = AIMED_PROJECTILE_CLASS;
     }
 
     static createBaseEnemy() {
@@ -32,5 +37,9 @@ export class BaseEnemy extends Actor {
         };
         BaseEnemy.enemyIncrementor++;
         return enemy
+    }
+
+    getPointValue() {
+        return this.#pointValue;
     }
 }

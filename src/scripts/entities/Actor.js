@@ -23,6 +23,9 @@ export class Actor extends Movable {
         this.#projectileClass = projectileClass;
         this.#shotVelocityFactor = shotVelocityFactor;
     }
+    getAimedProjectileClass() {
+        return this.aimedProjectileClass ? this.aimedProjectileClass : this.#projectileClass
+    }
     /**
      * 
      */
@@ -59,7 +62,7 @@ export class Actor extends Movable {
         const deltaCoordsToTarget = { deltaX: deltaToTargetX, deltaY: deltaToTargetY }
         const projectileVector = Projectile.calculateShotMovement(this.isFromPlayer, this.#shotVelocityFactor, deltaCoordsToTarget)
         const projectileData = Projectile.createProjectile({
-            projectileClass: this.#projectileClass,
+            projectileClass: this.getAimedProjectileClass(),
             shooter: this,
             projectileDamage: this.#atkDamage,
             projectileSpeedX: projectileVector.moveSpeedX,

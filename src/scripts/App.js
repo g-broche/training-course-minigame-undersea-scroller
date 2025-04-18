@@ -1,7 +1,19 @@
+/*
+
+TO DO :
+    Increment score & enemy defeated
+    handle player death gracefully
+    add replay round
+    add UI feedback (start game, pause, etc...)
+    add visual assets
+*/
+
+
 import { Player } from "./entities/Player.js";
 import { Controller } from "./mechanics/Controller.js";
 import { InitializationError } from "./mechanics/Errors.js";
 import { GameBoard } from "./mechanics/GameBoard.js"
+import { ScoreBoard } from "./mechanics/ScoreBoard.js";
 
 export class App {
     static #instance = null;
@@ -9,10 +21,14 @@ export class App {
     gameBoard = null;
     /** @type { Controller } */
     controller = null;
+    /** @type { ScoreBoard } */
+    scoreBoard = null;
     /** @type { Player } */
     player = null;
     isPaused = false;
-    delayBetweenSpawns = 3;
+    #IsPlaying = false;
+    #isInitialized = false;
+    delayBetweenSpawns = 5;
     framesUntilNextSpawn = 0;
     constructor() {
         if (App.#instance) {
@@ -63,33 +79,28 @@ export class App {
                 break;
         }
     }
-    run() {
-        console.log("App has started");
-        try {
-            this.gameBoard = GameBoard.getInstance();
-            this.gameBoard.initialize("game-board");
-            this.controller = Controller.getInstance();
-            this.player = Player.getInstance();
-            this.playRound();
-        } catch (error) {
-            console.log(`Error type ${error.constructor.name} : ${error.message}`, error);
+    togglePause() {
+        this.isPaused = !this.isPaused;
+        if (!this.isPaused) {
+            console.log("resuming game");
+            this.playFrame();
+            this.scoreBoard.startClock();
+            return;
         }
+        this.scoreBoard.stopClock();
+        console.log("pausing game");
     }
-    playRound() {
-        console.log("start round")
-        if (!this.gameBoard) {
-            throw new InitializationError("Gameboard has not been initialized when starting new round");
-        }
-        if (!this.controller) {
-            throw new InitializationError("Controller has not been initialized when starting new round");
-        }
+    initialize() {
         window.addEventListener("keydown", (e) => {
+            if (!this.#isInitialized) {
+                return
+            }
+            if (!this.#IsPlaying) {
+                this.playRound()
+                return
+            }
             if (e.code === "KeyP") {
-                this.isPaused = !this.isPaused;
-                if (!this.isPaused) {
-                    this.playFrame();
-                }
-                console.log(`${this.isPaused ? "game has been paused" : "game has resumed"}`);
+                this.togglePause();
                 return;
             }
             this.controller.addInput(e.code);
@@ -97,6 +108,32 @@ export class App {
         window.addEventListener("keyup", (e) => {
             this.controller.removeInput(e.code);
         })
+    }
+    run() {
+        try {
+            console.log("App has started");
+            this.gameBoard = GameBoard.getInstance();
+            this.gameBoard.initialize("game-board");
+            this.scoreBoard = ScoreBoard.getInstance();
+            this.scoreBoard.initialize("scoreboard");
+            this.controller = Controller.getInstance();
+            this.player = Player.getInstance();
+            this.initialize();
+            this.#isInitialized = true;
+        } catch (error) {
+            console.log(`Error type ${error.constructor.name} : ${error.message}`, error);
+        }
+    }
+    playRound() {
+        this.#IsPlaying = true
+        this.scoreBoard.startClock()
+        console.log("start round")
+        if (!this.gameBoard) {
+            throw new InitializationError("Gameboard has not been initialized when starting new round");
+        }
+        if (!this.controller) {
+            throw new InitializationError("Controller has not been initialized when starting new round");
+        }
         this.gameBoard.addPlayer();
         this.playFrame();
     }
@@ -124,11 +161,12 @@ export class App {
             projectile.ActualizeDisplayLocation();
             for (let [enemyId, enemy] of this.gameBoard.enemies) {
                 if (projectile.hasCollisionWith(enemy)) {
-                    enemy.takeHit(projectile.damage)
-                    this.queueProjectileForDeletion({ projectileId: projectileId, projectile: projectile })
+                    enemy.takeHit(projectile.damage);
+                    this.queueProjectileForDeletion({ projectileId: projectileId, projectile: projectile });
                     if (!enemy.isAlive()) {
-                        console.log("enemy is dead")
-                        this.gameBoard.addEnemyToDespawnList(enemyId)
+                        this.scoreBoard.incrementDefeatedEnemyCounter();
+                        this.scoreBoard.increaseScore(enemy.getPointValue());
+                        this.gameBoard.addEnemyToDespawnList(enemyId);
                     }
                     break;
                 }
