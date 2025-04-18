@@ -1,7 +1,5 @@
 /*
-
 TO DO :
-    Increment score & enemy defeated
     handle player death gracefully
     add replay round
     add UI feedback (start game, pause, etc...)
