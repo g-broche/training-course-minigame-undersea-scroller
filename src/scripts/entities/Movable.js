@@ -26,6 +26,7 @@ export class Movable {
             left: null,
         }
     }
+    hasHealthBar = false;
     constructor(baseClass) {
         this.#baseClass = baseClass;
     }
@@ -39,6 +40,14 @@ export class Movable {
     createElement() {
         this.domElement.hitbox = document.createElement("div");
         this.domElement.hitbox.className = this.#baseClass;
+        if (this.hasHealthBar) {
+            this.domElement.healthBarContainer = document.createElement("div");
+            this.domElement.healthBarContainer.className = "healthbar";
+            this.domElement.healthBarHealth = document.createElement("div");
+            this.domElement.healthBarHealth.className = "hp";
+            this.domElement.healthBarContainer.appendChild(this.domElement.healthBarHealth)
+            this.domElement.hitbox.appendChild(this.domElement.healthBarContainer)
+        }
         return this.domElement.hitbox;
     }
     removeElement() {

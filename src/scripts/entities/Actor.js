@@ -2,11 +2,13 @@ import { Movable } from "./Movable.js";
 import { Projectile } from "./Projectile.js";
 
 export class Actor extends Movable {
+    #maxHealth;
     #health;
     #atkDamage;
     #projectileClass;
     #shotVelocityFactor;
     #isAlive = true;
+    hasHealthBar = true;
     isAbleToFire = true;
     rateOfFire;
     framesUntilNextShot = 0;
@@ -14,12 +16,12 @@ export class Actor extends Movable {
     #shotsToDespawn = new Set();
     constructor({ baseClass, health, atkDamage, shotVelocityFactor, projectileClass, rateOfFire }) {
         super(baseClass);
+        this.#maxHealth = health;
         this.#health = health;
         this.#atkDamage = atkDamage;
         this.rateOfFire = rateOfFire;
         this.#projectileClass = projectileClass;
         this.#shotVelocityFactor = shotVelocityFactor;
-        this.domElement.healthBar = null;
     }
     /**
      * 
@@ -96,12 +98,16 @@ export class Actor extends Movable {
             this.#shots.delete(id)
         }
     }
+    changeDisplayedHealth() {
+        const percentage = this.#health > 0 ? this.#health / this.#maxHealth * 100 : 0;
+        this.domElement.healthBarHealth.style.width = `${percentage}%`
+    }
     takeHit(damageReceived) {
         this.#health -= damageReceived;
+        this.changeDisplayedHealth()
         if (this.#health <= 0) {
             this.#isAlive = false
         }
-        console.log(`${this.#health} HP remaining`)
     }
     isAlive() {
         return this.#isAlive;
