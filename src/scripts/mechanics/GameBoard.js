@@ -27,6 +27,7 @@ export class GameBoard {
     moveSpeedBase = null;
     MaxSpawnRetry = 5;
     #enemiesToDespawn = new Set();
+    #cleanedEnemiesId = new Set();
     constructor() {
         if (GameBoard.#instance) {
             return GameBoard.#instance;
@@ -94,25 +95,18 @@ export class GameBoard {
             const randomCoords = this.setRandomSpawnLocation()
             newEnemy.enemy.setPosition(randomCoords);
             let spawnRetry = 0;
-            console.log(`>>> NEW UNIT SPAWN STARTS`);
+            // console.log(`>>> NEW UNIT SPAWN STARTS`);
             let isCollidingWithExistingEntities = this.isCollidingWithExistingActorsOnSpawn(newEnemy.enemy)
-            console.log(`>>>>>> Initial collision triggered : `, isCollidingWithExistingEntities);
-            /**
-             * 
-             * 
-             * LE FUN
-             * 
-             * 
-            */
+            // console.log(`>>>>>> Initial collision triggered : `, isCollidingWithExistingEntities);
             while (isCollidingWithExistingEntities && spawnRetry < this.MaxSpawnRetry) {
                 spawnRetry++
-                console.log(`>>>>>> Attempting spawn at new location ${spawnRetry}`);
+                // console.log(`>>>>>> Attempting spawn at new location ${spawnRetry}`);
                 const newRandomCoords = this.setRandomSpawnLocation()
                 newEnemy.enemy.setPosition(newRandomCoords);
                 isCollidingWithExistingEntities = this.isCollidingWithExistingActorsOnSpawn(newEnemy.enemy)
             }
             if (spawnRetry >= this.MaxSpawnRetry && isCollidingWithExistingEntities) {
-                console.log(`!!!!!!!!! ABORTING SPAWN AFTER TOO MANY RELOCATION ATTEMPTS`);
+                // console.log(`!!!!!!!!! ABORTING SPAWN AFTER TOO MANY RELOCATION ATTEMPTS`);
                 newEnemyElement.remove();
                 newEnemy.enemy = null;
                 return;
@@ -120,7 +114,7 @@ export class GameBoard {
             this.enemies.set(newEnemy.id, newEnemy.enemy)
             newEnemy.enemy.ActualizeDisplayLocation();
             newEnemy.enemy.toggleVisibility(true)
-            console.log(`********* New enemy was added `);
+            // console.log(`********* New enemy was added `);
 
         } catch (error) {
             console.log(error)
@@ -144,22 +138,22 @@ export class GameBoard {
     addEnemyToDespawnList(enemyId) {
         this.#enemiesToDespawn.add(enemyId)
     }
-    delistDeadEnemies() {
-        for (const id of this.#enemiesToDespawn) {
-            this.enemies.delete(id)
-        }
-        this.#enemiesToDespawn.clear()
-    }
     clearDeadEnemies() {
         for (const enemyId of this.#enemiesToDespawn) {
             let enemyToDelete = this.enemies.get(enemyId);
             if (enemyToDelete) {
                 enemyToDelete.removeFromDom();
-                enemyToDelete = null
-                this.enemies.delete(enemyId)
+                if (!enemyToDelete.hasLiveShots()) {
+                    enemyToDelete = null
+                    this.#cleanedEnemiesId.add(enemyId)
+                    this.enemies.delete(enemyId)
+                }
             }
-            this.#enemiesToDespawn.clear()
         }
+        for (const cleanedEnemyId of this.#cleanedEnemiesId) {
+            this.#enemiesToDespawn.delete(cleanedEnemyId)
+        }
+        this.#cleanedEnemiesId.clear()
     }
     isOutOfBounds(movable) {
         return movable.positions.boundaries.top > this.sizes.height

@@ -104,6 +104,21 @@ export class App {
         this.reloadNextSpawn();
         this.player.reloadNextShot();
         this.consumeActions();
+        this.handlePlayerProjectileActions()
+        this.gameBoard.clearDeadEnemies()
+        this.player.despawnExpiredShots()
+        this.handleEnemyActions()
+        this.handleEnemiesProjectileActions()
+        if (this.framesUntilNextSpawn === 0) {
+            this.gameBoard.addEnemyAtRandom();
+            this.framesUntilNextSpawn = this.delayBetweenSpawns * 60;
+        }
+
+        if (!this.isPaused) {
+            window.requestAnimationFrame(() => { this.playFrame() });
+        }
+    }
+    handlePlayerProjectileActions() {
         for (let [projectileId, projectile] of this.player.getShots()) {
             projectile.move();
             projectile.ActualizeDisplayLocation();
@@ -122,15 +137,34 @@ export class App {
                 this.queueProjectileForDeletion({ projectileId: projectileId, projectile: projectile })
             }
         }
-        this.gameBoard.clearDeadEnemies()
-        this.player.despawnExpiredShots()
-        if (this.framesUntilNextSpawn === 0) {
-            this.gameBoard.addEnemyAtRandom();
-            this.framesUntilNextSpawn = this.delayBetweenSpawns * 60;
+    }
+    handleEnemiesProjectileActions() {
+        for (const [enemyId, enemy] of this.gameBoard.enemies) {
+            for (let [projectileId, projectile] of enemy.getShots()) {
+                projectile.move();
+                projectile.ActualizeDisplayLocation();
+                if (projectile.hasCollisionWith(this.player)) {
+                    this.player.takeHit(projectile.damage)
+                    this.queueProjectileForDeletion({ projectileId: projectileId, projectile: projectile })
+                    if (!this.player.isAlive()) {
+                        console.log("player is dead")
+                        alert("player Died")
+                    }
+                }
+                if (this.gameBoard.isOutOfBounds(projectile)) {
+                    this.queueProjectileForDeletion({ projectileId: projectileId, projectile: projectile })
+                }
+            }
+            enemy.despawnExpiredShots()
         }
-
-        if (!this.isPaused) {
-            window.requestAnimationFrame(() => { this.playFrame() });
+    }
+    handleEnemyActions() {
+        for (const [enemyId, enemy] of this.gameBoard.enemies) {
+            enemy.reloadNextShot()
+            const rng = Math.floor(Math.random() * 3) + 1;
+            rng === 3
+                ? enemy.fireAimedProjectile(this.gameBoard, this.player)
+                : enemy.fireProjectile(this.gameBoard)
         }
     }
     queueProjectileForDeletion({ projectileId, projectile }) {

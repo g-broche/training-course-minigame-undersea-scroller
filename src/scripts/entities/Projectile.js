@@ -6,7 +6,8 @@ export class Projectile extends Movable {
     damage;
     /** @type {Movable} */
     owner = null;
-    isFromPlayer = false
+    /** @type {boolean} */
+    isFromPlayer = false;
     constructor({ baseClass, owner, damage = 10, speedX, speedY }) {
         super(`projectile ${baseClass}`);
         this.owner = owner;
@@ -25,14 +26,28 @@ export class Projectile extends Movable {
      * @param {Number} shotVelocityFactor 
      * @param {{deltaX: Number, deltaY: Number}} deltaCoordsToTarget 
      */
-    static calculateShotSpeedFromVelocityFactor(shotVelocityFactor, deltaCoordsToTarget = null) {
+    static calculateShotMovement(isFromPlayer = false, shotVelocityFactor, deltaCoordsToTarget = null) {
         if (!deltaCoordsToTarget) {
-            const moveSpeedX = shotVelocityFactor * Projectile.baseProjectileVelocity
+            const moveSpeedX = isFromPlayer
+                ? shotVelocityFactor * Projectile.baseProjectileVelocity
+                : shotVelocityFactor * Projectile.baseProjectileVelocity * -1
             const moveSpeedY = 0
             return {
                 moveSpeedX: moveSpeedX,
                 moveSpeedY: moveSpeedY
             }
+        }
+        const distanceToTarget = Math.sqrt(
+            deltaCoordsToTarget.deltaX * deltaCoordsToTarget.deltaX + deltaCoordsToTarget.deltaY * deltaCoordsToTarget.deltaY
+        );
+        const unitX = deltaCoordsToTarget.deltaX / distanceToTarget;
+        const unitY = deltaCoordsToTarget.deltaY / distanceToTarget;
+        console.log(`distance: ${distanceToTarget}, unitX = ${unitX}, unitY = ${unitY}`)
+        const moveSpeedX = unitX * shotVelocityFactor * Projectile.baseProjectileVelocity
+        const moveSpeedY = unitY * shotVelocityFactor * Projectile.baseProjectileVelocity
+        return {
+            moveSpeedX: moveSpeedX,
+            moveSpeedY: moveSpeedY
         }
     }
 
