@@ -12,7 +12,7 @@ export class App {
     /** @type { Player } */
     player = null;
     isPaused = false;
-    delayBetweenSpawns = 5;
+    delayBetweenSpawns = 3;
     framesUntilNextSpawn = 0;
     constructor() {
         if (App.#instance) {

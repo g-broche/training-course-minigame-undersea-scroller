@@ -25,6 +25,7 @@ export class GameBoard {
         }
     }
     moveSpeedBase = null;
+    MaxSpawnRetry = 5;
     #enemiesToDespawn = new Set();
     constructor() {
         if (GameBoard.#instance) {
@@ -82,7 +83,6 @@ export class GameBoard {
     addEnemyAtRandom() {
         try {
             const newEnemy = BaseEnemy.createBaseEnemy()
-            this.enemies.set(newEnemy.id, newEnemy.enemy)
             newEnemy.enemy.setSpeed({
                 moveSpeedX: this.moveSpeedBase,
                 moveSpeedY: this.moveSpeedBase / 2
@@ -93,13 +93,54 @@ export class GameBoard {
             newEnemy.enemy.setSize()
             const randomCoords = this.setRandomSpawnLocation()
             newEnemy.enemy.setPosition(randomCoords);
+            let spawnRetry = 0;
+            console.log(`>>> NEW UNIT SPAWN STARTS`);
+            let isCollidingWithExistingEntities = this.isCollidingWithExistingActorsOnSpawn(newEnemy.enemy)
+            console.log(`>>>>>> Initial collision triggered : `, isCollidingWithExistingEntities);
+            /**
+             * 
+             * 
+             * LE FUN
+             * 
+             * 
+            */
+            while (isCollidingWithExistingEntities && spawnRetry < this.MaxSpawnRetry) {
+                spawnRetry++
+                console.log(`>>>>>> Attempting spawn at new location ${spawnRetry}`);
+                const newRandomCoords = this.setRandomSpawnLocation()
+                newEnemy.enemy.setPosition(newRandomCoords);
+                isCollidingWithExistingEntities = this.isCollidingWithExistingActorsOnSpawn(newEnemy.enemy)
+            }
+            if (spawnRetry >= this.MaxSpawnRetry && isCollidingWithExistingEntities) {
+                console.log(`!!!!!!!!! ABORTING SPAWN AFTER TOO MANY RELOCATION ATTEMPTS`);
+                newEnemyElement.remove();
+                newEnemy.enemy = null;
+                return;
+            }
+            this.enemies.set(newEnemy.id, newEnemy.enemy)
             newEnemy.enemy.ActualizeDisplayLocation();
             newEnemy.enemy.toggleVisibility(true)
+            console.log(`********* New enemy was added `);
 
         } catch (error) {
             console.log(error)
         }
     }
+    /**
+     * 
+     * @param {Movable} movable 
+     */
+    isCollidingWithExistingActorsOnSpawn(movable) {
+        if (movable.hasCollisionWith(this.player)) {
+            return true
+        }
+        const enemyArray = Array.from(this.enemies.values())
+        return enemyArray.some((enemy) => {
+            const result = movable.hasCollisionWith(enemy);
+            return result;
+        })
+    }
+
     addEnemyToDespawnList(enemyId) {
         this.#enemiesToDespawn.add(enemyId)
     }
