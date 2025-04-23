@@ -77,6 +77,55 @@ header#page-header div#scoreboard {
   justify-content: space-evenly;
 }
 
+#modal-background {
+  position: fixed;
+  z-index: 10;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  backdrop-filter: blur(5px);
+  background-color: rgba(40, 40, 40, 0.3);
+}
+
+#modal-window {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 11;
+  border-radius: 1rem;
+  padding: 3vh 4vw;
+  width: 60%;
+  height: fit-content;
+  background-color: lightblue;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+#modal-window #modal-close {
+  border: 1px solid rgb(25, 27, 77);
+  border-radius: 5rem;
+  padding: 0.25rem 1rem;
+  width: fit-content;
+  color: rgb(25, 27, 77);
+  background-color: rgb(123, 185, 235);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+#modal-window #modal-content > div {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: rgb(25, 27, 77);
+  gap: 1rem;
+}
+
 * {
   font-size: 1.25rem;
 }
@@ -90,8 +139,16 @@ body {
   align-items: center;
 }
 
+.display-none {
+  display: none !important;
+}
+
 .hidden {
   visibility: hidden;
+}
+
+.no-scroll {
+  overflow: hidden;
 }
 
 /*# sourceMappingURL=style.css.map */

@@ -15,6 +15,14 @@ body {
     align-items: center;
 }
 
+.display-none {
+    display: none !important;
+}
+
 .hidden {
     visibility: hidden;
+}
+
+.no-scroll {
+    overflow: hidden;
 }

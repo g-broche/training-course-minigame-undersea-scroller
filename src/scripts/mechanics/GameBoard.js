@@ -49,6 +49,20 @@ export class GameBoard {
         Projectile.setBaseProjectileVelocity(this.moveSpeedBase * 1.25)
         Movable.setBaseMoveSpeed(this.moveSpeedBase);
     }
+    // TO DO
+    reset() {
+        this.player.restoreToFullHealth();
+        this.respawnPlayer();
+        for (let [enemyId, enemy] of this.enemies) {
+            enemy.clearAllProjectiles();
+            enemy.removeFromDom();
+            enemy = null
+        }
+        this.enemies.clear()
+    }
+    getLivingEnemyCount() {
+        return Array.from(this.enemies.values()).filter((enemy) => enemy.isAlive()).length;
+    }
     getBoundaries() {
         return {
             right: this.domElements.board.offsetWidth,
@@ -65,6 +79,10 @@ export class GameBoard {
         this.player.toggleVisibility(false)
         this.domElements.board.append(playerElement);
         this.player.setSize()
+        this.respawnPlayer()
+
+    }
+    respawnPlayer() {
         this.player.setPosition({ posX: this.player.sizes.halfWidth, posY: this.sizes.height / 2 });
         this.player.ActualizeDisplayLocation();
         this.player.toggleVisibility(true)

@@ -26,6 +26,14 @@ export class Actor extends Movable {
     getAimedProjectileClass() {
         return this.aimedProjectileClass ? this.aimedProjectileClass : this.#projectileClass
     }
+    setHealth(value) {
+        this.#health = value;
+        this.#isAlive = this.#health > 0;
+        this.changeDisplayedHealth();
+    }
+    restoreToFullHealth() {
+        this.setHealth(this.#maxHealth);
+    }
     /**
      * 
      */
@@ -101,16 +109,20 @@ export class Actor extends Movable {
             this.#shots.delete(id)
         }
     }
+    clearAllProjectiles() {
+        for (let [projectileId, projectile] of this.#shots) {
+            projectile.removeElement();
+            projectile = null;
+        }
+        this.#shots.clear()
+        this.#shotsToDespawn.clear()
+    }
     changeDisplayedHealth() {
         const percentage = this.#health > 0 ? this.#health / this.#maxHealth * 100 : 0;
         this.domElement.healthBarHealth.style.width = `${percentage}%`
     }
     takeHit(damageReceived) {
-        this.#health -= damageReceived;
-        this.changeDisplayedHealth()
-        if (this.#health <= 0) {
-            this.#isAlive = false
-        }
+        this.setHealth(this.#health -= damageReceived);
     }
     isAlive() {
         return this.#isAlive;

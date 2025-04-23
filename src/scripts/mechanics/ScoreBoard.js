@@ -10,7 +10,9 @@ export class ScoreBoard {
         container: null,
         scoreDisplay: null,
         enemiesDefeatedDisplay: null,
-        timeDisplay: null
+        timeDisplay: null,
+        instructionWrapper: null,
+        instructionMessage: null
     }
     constructor() {
         if (ScoreBoard.#instance) {
@@ -30,21 +32,26 @@ export class ScoreBoard {
             this.domElements.scoreDisplay = document.getElementById("score-value")
             this.domElements.enemiesDefeatedDisplay = document.getElementById("enemies-value")
             this.domElements.timeDisplay = document.getElementById("time-value")
+            this.domElements.instructionWrapper = document.getElementById("instructions")
+            this.domElements.instructionMessage = document.getElementById("instruction-message")
             if (
                 !this.domElements.container
                 || !this.domElements.scoreDisplay
                 || !this.domElements.enemiesDefeatedDisplay
                 || !this.domElements.timeDisplay
+                || !this.domElements.instructionWrapper
+                || !this.domElements.instructionMessage
             ) {
-                throw new Error("A required element of the scoreboard was not retrieved from the page")
+                throw new InitializationError("A required element of the scoreboard was not retrieved from the page")
             }
-            this.refreshScoreDisplay();
-            this.refreshDefeatedEnemyCounter();
-            this.refreshSurvivedTime();
+            this.resetScore();
         } catch (error) {
             console.log(error)
             throw new InitializationError("Failed to initialize Scoreboard");
         }
+    }
+    getScore() {
+        return this.#score;
     }
     increaseScore(pointsToAdd) {
         this.#score += pointsToAdd;
@@ -52,6 +59,9 @@ export class ScoreBoard {
     }
     refreshScoreDisplay() {
         this.domElements.scoreDisplay.innerText = this.#score;
+    }
+    getDefeatedEnemyCount() {
+        return this.#defeatedEnemies;
     }
     incrementDefeatedEnemyCounter() {
         this.#defeatedEnemies++;
@@ -64,12 +74,13 @@ export class ScoreBoard {
         this.#timeSurvived++;
         this.refreshSurvivedTime();
     }
-    refreshSurvivedTime() {
-        console.log(this.#timeSurvived)
+    getSurvivedTimeString() {
         const minutes = Math.floor(this.#timeSurvived / 60).toString()
         const seconds = (this.#timeSurvived % 60).toString()
-        const timeToShow = `${minutes.length > 1 ? minutes : `0${minutes}`}:${seconds.length > 1 ? seconds : `0${seconds}`}`
-        this.domElements.timeDisplay.innerText = timeToShow
+        return `${minutes.length > 1 ? minutes : `0${minutes}`}:${seconds.length > 1 ? seconds : `0${seconds}`}`
+    }
+    refreshSurvivedTime() {
+        this.domElements.timeDisplay.innerText = this.getSurvivedTimeString()
     }
     startClock() {
         this.#clockIntervalId = setInterval(() => {
@@ -79,5 +90,25 @@ export class ScoreBoard {
     stopClock() {
         clearInterval(this.#clockIntervalId)
         this.#clockIntervalId = null
+    }
+    resetScore() {
+        this.#score = 0;
+        this.#defeatedEnemies = 0;
+        this.#timeSurvived = 0;
+        this.refreshScoreDisplay();
+        this.refreshDefeatedEnemyCounter();
+        this.refreshSurvivedTime();
+    }
+    clearInstruction() {
+        this.domElements.instructionMessage.innerText = "";
+    }
+    displayInstruction(message) {
+        this.domElements.instructionMessage.innerText = message;
+    }
+    displayStandbyMessage() {
+        this.displayInstruction(`Press any key to start the game`);
+    }
+    displayPauseMessage() {
+        this.displayInstruction(`Game is paused, press "P" to resume`);
     }
 }
