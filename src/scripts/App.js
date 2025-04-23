@@ -1,6 +1,6 @@
 /*
 TO DO :
-    Clear or resets assets on new round
+    handle movable sizing through JS instead of calculting from style
     add visual assets
 */
 
