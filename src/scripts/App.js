@@ -12,6 +12,7 @@ import { GameBoard } from "./mechanics/GameBoard.js"
 import { Instruction } from "./mechanics/Instruction.js";
 import { Modal } from "./mechanics/Modal.js";
 import { ScoreBoard } from "./mechanics/ScoreBoard.js";
+import { throttleWithDebounce } from "./utils/utils.js";
 
 export class App {
     static #instance = null;
@@ -35,6 +36,7 @@ export class App {
     #maxSimultaneousEnemies = 5;
     delayBetweenSpawns = 5;
     framesUntilNextSpawn = 0;
+    #frameRequestId = null;
     constructor() {
         if (App.#instance) {
             return App.#instance;
@@ -117,12 +119,39 @@ export class App {
             return;
         }
         this.scoreBoard.stopClock();
+        this.stopGame()
         console.log("pausing game");
     }
+    InitializeComponents() {
+        this.gameBoard = GameBoard.getInstance();
+        this.gameBoard.initialize("game-board");
+        this.scoreBoard = ScoreBoard.getInstance();
+        this.scoreBoard.initialize("scoreboard");
+        this.controller = Controller.getInstance();
+        this.instruction = Instruction.getInstance();
+        this.instruction.setDomElement("instruction-message")
+        this.modal = Modal.getInstance();
+        this.gameBoard.domElements.board.append(...this.modal.createModalStructure())
+        this.modal.initialize({
+            actionOnClose: () => {
+                this.instruction.displayStandbyMessage()
+                this.#isModalOpen = false;
+            }
+        })
+        this.player = Player.getInstance();
+    }
+
     /**
-     * Initialize App by adding input listeners
+     * Initialize App listeners
      */
-    initialize() {
+    initializeListeners() {
+        window.addEventListener("resize", throttleWithDebounce(() => {
+            this.#isPlaying = false;
+            this.stopGame();
+            console.log("test");
+            this.gameBoard.initialize("game-board");
+            this.playRound();
+        }, 1000, 1200))
         window.addEventListener("keydown", (e) => {
             if (!this.#isInitialized || this.#isModalOpen === true) {
                 return
@@ -147,23 +176,8 @@ export class App {
     run() {
         try {
             console.log("App has started");
-            this.gameBoard = GameBoard.getInstance();
-            this.gameBoard.initialize("game-board");
-            this.scoreBoard = ScoreBoard.getInstance();
-            this.scoreBoard.initialize("scoreboard");
-            this.controller = Controller.getInstance();
-            this.instruction = Instruction.getInstance();
-            this.instruction.setDomElement("instruction-message")
-            this.modal = Modal.getInstance();
-            this.gameBoard.domElements.board.append(...this.modal.createModalStructure())
-            this.modal.initialize({
-                actionOnClose: () => {
-                    this.instruction.displayStandbyMessage()
-                    this.#isModalOpen = false;
-                }
-            })
-            this.player = Player.getInstance();
-            this.initialize();
+            this.InitializeComponents()
+            this.initializeListeners();
             this.#isInitialized = true;
             this.instruction.displayStandbyMessage();
         } catch (error) {
@@ -174,22 +188,8 @@ export class App {
      * starts a keeps a round going
      */
     playRound() {
-        this.setIsPlaying(true);
-        this.scoreBoard.resetScore();
-        this.scoreBoard.startClock();
         console.log("start round");
-        if (!this.gameBoard) {
-            throw new InitializationError("Gameboard has not been initialized when starting new round");
-        }
-        if (!this.controller) {
-            throw new InitializationError("Controller has not been initialized when starting new round");
-        }
-        if (this.#isInitialStart) {
-            this.gameBoard.addPlayer();
-            this.#isInitialStart = false;
-        } else {
-            this.gameBoard.reset();
-        }
+        this.ResetGame()
         this.playFrame();
     }
     /**
@@ -208,8 +208,8 @@ export class App {
             this.gameBoard.addEnemyAtRandom();
             this.framesUntilNextSpawn = this.delayBetweenSpawns * 60;
         }
-        if (!this.#isPaused && this.#isPlaying) {
-            window.requestAnimationFrame(() => { this.playFrame() });
+        if (this.#isPlaying && !this.#isPaused) {
+            this.#frameRequestId = window.requestAnimationFrame(() => { this.playFrame() });
         }
     }
     /**
@@ -297,10 +297,33 @@ export class App {
         return contentWrapper;
     }
     handleGameOver() {
+        this.stopGame()
         this.setIsPlaying(false);
         this.scoreBoard.stopClock();
         this.#isModalOpen = true;
         this.modal.appendContent(this.createGameOverWindowContent());
         this.modal.show();
+    }
+
+    ResetGame() {
+        this.stopGame()
+        this.scoreBoard.stopClock();
+        this.setIsPlaying(true);
+        this.scoreBoard.resetScore();
+        this.scoreBoard.startClock();
+        this.framesUntilNextSpawn = 0;
+        if (this.#isInitialStart) {
+            this.gameBoard.addPlayer();
+            this.#isInitialStart = false;
+        } else {
+            this.gameBoard.reset();
+        }
+    }
+
+    stopGame() {
+        if (this.#frameRequestId !== null) {
+            cancelAnimationFrame(this.#frameRequestId);
+            this.#frameRequestId = null;
+        }
     }
 }

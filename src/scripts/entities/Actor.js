@@ -79,7 +79,6 @@ export class Actor extends Movable {
         });
         this.#shots.set(projectileData.id, projectileData.projectile);
         projectileData.projectile.placeAtOrigin(gameBoard);
-        console.log(projectileData.projectile)
         this.isAbleToFire = false;
         this.framesUntilNextShot = (60 / this.rateOfFire) * 60 * 1.5
     }

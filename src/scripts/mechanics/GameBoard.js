@@ -41,7 +41,9 @@ export class GameBoard {
         return GameBoard.#instance;
     }
     initialize(boardId) {
+        console.log("initialize board")
         this.domElements.board = document.getElementById(boardId);
+        console.log(this.domElements.board.offsetWidth)
         this.sizes.height = this.domElements.board.offsetHeight;
         this.sizes.width = this.domElements.board.offsetWidth;
         this.setAllowedEnemySpawnArea()
