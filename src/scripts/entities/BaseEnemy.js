@@ -11,6 +11,8 @@ const AIMED_PROJECTILE_CLASS = "enemy-attack aimed-attack";
 
 export class BaseEnemy extends Actor {
     static enemyIncrementor = 1;
+    screenWidthtoEntityWidthRatio = 4;
+    screenWidthtoEntityHeightRatio = 4;
     #pointValue;
     aimedProjectileClass;
     get isFromPlayer() {

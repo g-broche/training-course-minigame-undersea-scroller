@@ -49,7 +49,12 @@ export class GameBoard {
         Projectile.setBaseProjectileVelocity(this.moveSpeedBase * 1.25)
         Movable.setBaseMoveSpeed(this.moveSpeedBase);
     }
-    // TO DO
+    calculateRatioPixelFromBoardWidth(ratio) {
+        return this.sizes.width / 100 * ratio
+    }
+    calculateRatioPixelFromBoardHeight(ratio) {
+        return this.sizes.height / 100 * ratio
+    }
     reset() {
         this.player.restoreToFullHealth();
         this.respawnPlayer();
@@ -77,8 +82,8 @@ export class GameBoard {
         })
         const playerElement = this.player.createElement();
         this.player.toggleVisibility(false)
+        this.player.setSize(this)
         this.domElements.board.append(playerElement);
-        this.player.setSize()
         this.respawnPlayer()
 
     }
@@ -109,7 +114,7 @@ export class GameBoard {
             const newEnemyElement = newEnemy.enemy.createElement()
             newEnemy.enemy.toggleVisibility(false)
             this.domElements.board.append(newEnemyElement);
-            newEnemy.enemy.setSize()
+            newEnemy.enemy.setSize(this)
             const randomCoords = this.setRandomSpawnLocation()
             newEnemy.enemy.setPosition(randomCoords);
             let spawnRetry = 0;

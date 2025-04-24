@@ -6,14 +6,10 @@
 
 .shigu-attack {
     border-radius: 50%;
-    width: $player-attack-radius;
-    height: $player-attack-radius;
     background-color: $color-light-blue;
 }
 
 .enemy-attack {
     border-radius: 50%;
-    width: $enemy-attack-radius;
-    height: $enemy-attack-radius;
     background-color: $color-red;
 }

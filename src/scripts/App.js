@@ -1,6 +1,6 @@
 /*
 TO DO :
-    handle movable sizing through JS instead of calculting from style
+    handle window resizing (okay between round, throw error during round)
     add visual assets
 */
 

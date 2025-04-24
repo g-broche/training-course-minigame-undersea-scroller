@@ -3,7 +3,5 @@ $placeholder-player-color: rgb(193, 60, 160);
 
 .player {
     position: absolute;
-    width: $player-hitbox-width;
-    height: $player-hitbox-height;
     background-color: $placeholder-player-color;
 }

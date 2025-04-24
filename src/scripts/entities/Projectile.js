@@ -3,6 +3,8 @@ import { Movable } from "./Movable.js";
 export class Projectile extends Movable {
     static baseProjectileVelocity;
     static projectileIncrementor = 1;
+    screenWidthtoEntityWidthRatio = 1.5;
+    screenWidthtoEntityHeightRatio = 1.5;
     damage;
     /** @type {Movable} */
     owner = null;
@@ -42,7 +44,6 @@ export class Projectile extends Movable {
         );
         const unitX = deltaCoordsToTarget.deltaX / distanceToTarget;
         const unitY = deltaCoordsToTarget.deltaY / distanceToTarget;
-        console.log(`distance: ${distanceToTarget}, unitX = ${unitX}, unitY = ${unitY}`)
         const moveSpeedX = unitX * shotVelocityFactor * Projectile.baseProjectileVelocity
         const moveSpeedY = unitY * shotVelocityFactor * Projectile.baseProjectileVelocity
         return {
@@ -76,7 +77,7 @@ export class Projectile extends Movable {
         this.createElement();
         this.toggleVisibility(false)
         gameBoard.domElements.board.appendChild(this.domElement.hitbox)
-        this.setSize()
+        this.setSize(gameBoard)
         const originX = this.isFromPlayer
             ? this.owner.positions.boundaries.right + this.sizes.halfWidth
             : this.owner.positions.boundaries.left - this.sizes.halfWidth;

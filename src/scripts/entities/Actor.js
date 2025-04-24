@@ -1,4 +1,5 @@
 import { Movable } from "./Movable.js";
+import { Player } from "./Player.js";
 import { Projectile } from "./Projectile.js";
 
 export class Actor extends Movable {

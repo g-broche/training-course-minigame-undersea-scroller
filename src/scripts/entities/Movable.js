@@ -27,6 +27,8 @@ export class Movable {
         }
     }
     hasHealthBar = false;
+    screenWidthtoEntityWidthRatio = 1;
+    screenWidthtoEntityHeightRatio = 1;
     constructor(baseClass) {
         this.#baseClass = baseClass;
     }
@@ -59,12 +61,15 @@ export class Movable {
     removeClasses(classNames = []) {
         this.domElement.hitbox.classList.remove(...classNames);
     }
-    setSize() {
-        const rect = this.domElement.hitbox.getBoundingClientRect();
-        this.sizes.height = rect.height;
-        this.sizes.halfHeight = rect.height / 2;
-        this.sizes.width = rect.width;
-        this.sizes.halfWidth = rect.width / 2;
+    setSize(gameBoard) {
+        const height = gameBoard.calculateRatioPixelFromBoardWidth(this.screenWidthtoEntityHeightRatio);
+        const width = gameBoard.calculateRatioPixelFromBoardWidth(this.screenWidthtoEntityWidthRatio);
+        this.sizes.height = height
+        this.sizes.halfHeight = height / 2;
+        this.sizes.width = width;
+        this.sizes.halfWidth = width / 2;
+        this.domElement.hitbox.style.height = `${height}px`;
+        this.domElement.hitbox.style.width = `${width}px`;
     }
     setPosition({ posX, posY }) {
         this.positions.posX = posX;

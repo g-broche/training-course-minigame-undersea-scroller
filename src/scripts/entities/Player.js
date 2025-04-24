@@ -9,6 +9,8 @@ const PROJECTILE_CLASS = "shigu-attack"
 
 export class Player extends Actor {
     static #instance = null;
+    screenWidthtoEntityWidthRatio = 4;
+    screenWidthtoEntityHeightRatio = 2;
     get isFromPlayer() {
         return true;
     }
