@@ -1,0 +1,14 @@
+@use "../abstract/" as *;
+
+#instruction-message {
+    position: absolute;
+    z-index: 100;
+    top: 50%;
+    left: 50%;
+    font-size: $font-size-biggest;
+    transform: translate(-50%, -50%);
+    color: $color-instructions;
+    animation-name: blinking;
+    animation-duration: 2s;
+    animation-iteration-count: infinite;
+}

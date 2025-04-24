@@ -32,15 +32,11 @@ export class ScoreBoard {
             this.domElements.scoreDisplay = document.getElementById("score-value")
             this.domElements.enemiesDefeatedDisplay = document.getElementById("enemies-value")
             this.domElements.timeDisplay = document.getElementById("time-value")
-            this.domElements.instructionWrapper = document.getElementById("instructions")
-            this.domElements.instructionMessage = document.getElementById("instruction-message")
             if (
                 !this.domElements.container
                 || !this.domElements.scoreDisplay
                 || !this.domElements.enemiesDefeatedDisplay
                 || !this.domElements.timeDisplay
-                || !this.domElements.instructionWrapper
-                || !this.domElements.instructionMessage
             ) {
                 throw new InitializationError("A required element of the scoreboard was not retrieved from the page")
             }
@@ -98,17 +94,5 @@ export class ScoreBoard {
         this.refreshScoreDisplay();
         this.refreshDefeatedEnemyCounter();
         this.refreshSurvivedTime();
-    }
-    clearInstruction() {
-        this.domElements.instructionMessage.innerText = "";
-    }
-    displayInstruction(message) {
-        this.domElements.instructionMessage.innerText = message;
-    }
-    displayStandbyMessage() {
-        this.displayInstruction(`Press any key to start the game`);
-    }
-    displayPauseMessage() {
-        this.displayInstruction(`Game is paused, press "P" to resume`);
     }
 }

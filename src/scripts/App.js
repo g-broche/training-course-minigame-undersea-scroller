@@ -9,6 +9,7 @@ import { Player } from "./entities/Player.js";
 import { Controller } from "./mechanics/Controller.js";
 import { InitializationError } from "./mechanics/Errors.js";
 import { GameBoard } from "./mechanics/GameBoard.js"
+import { Instruction } from "./mechanics/Instruction.js";
 import { Modal } from "./mechanics/Modal.js";
 import { ScoreBoard } from "./mechanics/ScoreBoard.js";
 
@@ -20,6 +21,8 @@ export class App {
     controller = null;
     /** @type { ScoreBoard } */
     scoreBoard = null;
+    /** @type { Instruction } */
+    instruction = null;
     /** @type { Modal } */
     modal = null;
     /** @type { Player } */
@@ -40,11 +43,13 @@ export class App {
     }
     setIsPlaying(bool) {
         this.#isPlaying = bool;
-        this.#isPlaying ? this.scoreBoard.clearInstruction() : this.scoreBoard.displayStandbyMessage()
+        if (this.#isPlaying) {
+            this.instruction.clearInstruction()
+        }
     }
     setIsPause(bool) {
         this.#isPaused = bool;
-        this.#isPaused ? this.scoreBoard.displayPauseMessage() : this.scoreBoard.clearInstruction()
+        this.#isPaused ? this.instruction.displayPauseMessage() : this.instruction.clearInstruction()
     }
     static getInstance() {
         if (!App.#instance) {
@@ -147,17 +152,20 @@ export class App {
             this.scoreBoard = ScoreBoard.getInstance();
             this.scoreBoard.initialize("scoreboard");
             this.controller = Controller.getInstance();
+            this.instruction = Instruction.getInstance();
+            this.instruction.setDomElement("instruction-message")
             this.modal = Modal.getInstance();
             this.gameBoard.domElements.board.append(...this.modal.createModalStructure())
             this.modal.initialize({
                 actionOnClose: () => {
+                    this.instruction.displayStandbyMessage()
                     this.#isModalOpen = false;
                 }
             })
             this.player = Player.getInstance();
             this.initialize();
             this.#isInitialized = true;
-            this.scoreBoard.displayStandbyMessage();
+            this.instruction.displayStandbyMessage();
         } catch (error) {
             console.log(`Error type ${error.constructor.name} : ${error.message}`, error);
         }
