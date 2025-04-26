@@ -3,14 +3,14 @@ import { Enemy } from "./Enemy.js";
 export class Sharpshooter extends Enemy {
     static #maxHealth = 50;
     static #aktDamage = 30;
-    static #rateOfFire = 40;
+    static #rateOfFire = 60;
     static #shotVelocityFactor = 1.5
     static #entityClass = "enemy sharpshooter";
     static #projectileClass = "enemy-attack sharpshooter-attack";
     static #speedFactor = 0;
     static #pointValue = 100;
-    screenWidthtoEntityWidthRatio = 2.5;
-    screenWidthtoEntityHeightRatio = 1.5;
+    screenWidthtoEntityWidthRatio = 3;
+    screenWidthtoEntityHeightRatio = 2;
     get getProjectileSizeRatio() { return { width: 2, height: 1 } }
     constructor() {
         super(Sharpshooter.getEnemyTypeSheet());

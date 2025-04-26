@@ -3,6 +3,7 @@ import { Movable } from "../entities/Movable.js";
 import { Player } from "../entities/Player.js";
 import { Projectile } from "../entities/Projectile.js";
 import { Sharpshooter } from "../entities/Sharpshooter.js";
+import { Tank } from "../entities/Tank.js";
 
 export class GameBoard {
     static #instance = null
@@ -94,7 +95,7 @@ export class GameBoard {
         this.player.toggleVisibility(true)
     }
     setAllowedEnemySpawnArea() {
-        this.spawnArea.enemy.xMin = this.sizes.width * 0.6;
+        this.spawnArea.enemy.xMin = this.sizes.width * 0.75;
         this.spawnArea.enemy.xMax = this.sizes.width * 0.95;
         this.spawnArea.enemy.yMax = this.sizes.height * 0.90;
         this.spawnArea.enemy.yMin = this.sizes.height * 0.10;
@@ -105,7 +106,10 @@ export class GameBoard {
             posY: Math.random() * (this.spawnArea.enemy.yMax - this.spawnArea.enemy.yMin) + this.spawnArea.enemy.yMin
         }
     }
-    createEnemyUnit(enemyType = "base") {
+    createEnemyUnit(enemyType) {
+        if (enemyType === "tank") {
+            return Tank.create();
+        }
         if (enemyType === "sharpshooter") {
             return Sharpshooter.create();
         }

@@ -11,3 +11,20 @@
         opacity: 1;
     }
 }
+
+.player::after,
+.enemy:after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: red;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+}
+
+.player.damage-flash:after,
+.enemy.damage-flash:after {
+    animation: takingDamage 0.5s ease;
+    opacity: 0.7;
+}

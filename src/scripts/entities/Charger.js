@@ -3,11 +3,11 @@ import { Enemy } from "./Enemy.js";
 export class Charger extends Enemy {
     static #maxHealth = 100;
     static #aktDamage = 20;
-    static #rateOfFire = 20;
+    static #rateOfFire = 30;
     static #shotVelocityFactor = 1.2
     static #entityClass = "enemy charger";
-    static #projectileClass = "enemy-attack base";
-    static #speedFactor = .1;
+    static #projectileClass = "enemy-attack base-attack";
+    static #speedFactor = .15;
     static #pointValue = 50;
     screenWidthtoEntityWidthRatio = 4;
     screenWidthtoEntityHeightRatio = 4;

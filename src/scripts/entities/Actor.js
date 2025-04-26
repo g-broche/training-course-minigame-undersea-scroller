@@ -125,7 +125,10 @@ export class Actor extends Movable {
     }
     takeHit(damageReceived) {
         this.setHealth(this.#health -= damageReceived);
-        console.log(`damage ${damageReceived}, health remaining ${this.#health}`)
+        this.domElement.hitbox.classList.add("damage-flash");
+        setTimeout(() => {
+            this.domElement.hitbox.classList.remove("damage-flash");
+        }, 300)
     }
     isAlive() {
         return this.#isAlive;

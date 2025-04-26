@@ -33,14 +33,15 @@ export class App {
     #isInitialized = false;
     #isInitialStart = true;
     #isModalOpen = false;
-    #maxSimultaneousEnemies = 5;
+    #maxSimultaneousEnemies = 10;
     #spawnCount = 0;
     delayBetweenSpawns = 5;
     framesUntilNextSpawn = 60;
     #frameRequestId = null;
     #enemyTypes = [
         "base",
-        "sharpshooter"
+        "sharpshooter",
+        "tank"
     ]
     constructor() {
         if (App.#instance) {
@@ -222,11 +223,12 @@ export class App {
         }
     }
     pickEnemyTypeToSpawn() {
+        if (this.#spawnCount !== 0 && this.#spawnCount % 5 === 0) {
+            return this.#enemyTypes[2]
+        }
         if (this.#spawnCount !== 0 && this.#spawnCount % 3 === 0) {
-            console.log(`true, spawning ${this.#enemyTypes[1]}`)
             return this.#enemyTypes[1]
         }
-        console.log(`false, spawning ${this.#enemyTypes[0]}`)
         return this.#enemyTypes[0]
     }
 
@@ -238,6 +240,9 @@ export class App {
             projectile.move();
             projectile.ActualizeDisplayLocation();
             for (let [enemyId, enemy] of this.gameBoard.enemies) {
+                if (!enemy.isAlive()) {
+                    break;
+                }
                 if (projectile.hasCollisionWith(enemy)) {
                     enemy.takeHit(projectile.damage);
                     this.queueProjectileForDeletion({ projectileId: projectileId, projectile: projectile });
@@ -334,7 +339,8 @@ export class App {
         this.setIsPlaying(true);
         this.scoreBoard.resetScore();
         this.scoreBoard.startClock();
-        this.framesUntilNextSpawn = 0;
+        this.framesUntilNextSpawn = 60;
+        this.#spawnCount = 0;
         if (this.#isInitialStart) {
             this.gameBoard.addPlayer();
             this.#isInitialStart = false;
