@@ -265,10 +265,18 @@ export class App {
     handleEnemyActions() {
         for (const [enemyId, enemy] of this.gameBoard.enemies) {
             enemy.reloadNextShot()
-            const rng = Math.floor(Math.random() * 3) + 1;
-            rng === 3
-                ? enemy.fireAimedProjectile(this.gameBoard, this.player)
-                : enemy.fireProjectile(this.gameBoard)
+            if (this.gameBoard.isPlayerInFrontOfEnemy(enemy)) {
+                const rng = Math.floor(Math.random() * 3) + 1;
+                rng === 3
+                    ? enemy.fireAimedProjectile(this.gameBoard, this.player)
+                    : enemy.fireProjectile(this.gameBoard)
+            }
+            enemy.move()
+            enemy.ActualizeDisplayLocation()
+            if (this.gameBoard.isOutOfBounds(enemy)) {
+                this.setIsPlaying(false)
+                this.handleGameOver();
+            }
         }
     }
     /**

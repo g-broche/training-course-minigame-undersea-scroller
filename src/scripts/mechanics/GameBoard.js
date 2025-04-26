@@ -41,9 +41,7 @@ export class GameBoard {
         return GameBoard.#instance;
     }
     initialize(boardId) {
-        console.log("initialize board")
         this.domElements.board = document.getElementById(boardId);
-        console.log(this.domElements.board.offsetWidth)
         this.sizes.height = this.domElements.board.offsetHeight;
         this.sizes.width = this.domElements.board.offsetWidth;
         this.setAllowedEnemySpawnArea()
@@ -110,8 +108,8 @@ export class GameBoard {
         try {
             const newEnemy = BaseEnemy.createBaseEnemy()
             newEnemy.enemy.setSpeed({
-                moveSpeedX: this.moveSpeedBase,
-                moveSpeedY: this.moveSpeedBase / 2
+                moveSpeedX: -this.moveSpeedBase,
+                moveSpeedY: 0
             })
             const newEnemyElement = newEnemy.enemy.createElement()
             newEnemy.enemy.toggleVisibility(false)
@@ -185,5 +183,12 @@ export class GameBoard {
             || movable.positions.boundaries.left > this.sizes.width
             || movable.positions.boundaries.bottom < 0
             || movable.positions.boundaries.right < 0
+    }
+    /**
+     * 
+     * @param {BaseEnemy} enemy 
+     */
+    isPlayerInFrontOfEnemy(enemy) {
+        return enemy.positions.boundaries.left > this.player.positions.boundaries.right
     }
 }

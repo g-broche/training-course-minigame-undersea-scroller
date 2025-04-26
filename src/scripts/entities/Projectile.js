@@ -1,8 +1,9 @@
 import { Movable } from "./Movable.js";
 
 export class Projectile extends Movable {
-    static baseProjectileVelocity;
     static projectileIncrementor = 1;
+    static baseProjectileVelocity;
+    static #speedFactor = 1
     screenWidthtoEntityWidthRatio = 1.5;
     screenWidthtoEntityHeightRatio = 1.5;
     damage;
@@ -52,6 +53,10 @@ export class Projectile extends Movable {
         }
     }
 
+    getSpeedFactor() {
+        return Projectile.#speedFactor;
+    }
+
     static createProjectile({ projectileClass, shooter, projectileDamage, projectileSpeedX, projectileSpeedY }) {
         const projectile = {
             id: Projectile.projectileIncrementor,
@@ -88,11 +93,5 @@ export class Projectile extends Movable {
         })
         this.ActualizeDisplayLocation()
         this.toggleVisibility(true)
-    }
-
-    move() {
-        this.positions.posX += this.moveSpeed.x;
-        this.positions.posY += this.moveSpeed.y;
-        this.setBoundaries()
     }
 }

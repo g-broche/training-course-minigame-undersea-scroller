@@ -9,6 +9,7 @@ const PROJECTILE_CLASS = "shigu-attack"
 
 export class Player extends Actor {
     static #instance = null;
+    #speedFactor = 1.25;
     screenWidthtoEntityWidthRatio = 4;
     screenWidthtoEntityHeightRatio = 2;
     get isFromPlayer() {
@@ -27,6 +28,9 @@ export class Player extends Actor {
             rateOfFire: RATE_OF_FIRE
         });
         Player.#instance = this;
+    }
+    getSpeedFactor() {
+        return this.#speedFactor;
     }
     static getInstance() {
         if (!Player.#instance) {

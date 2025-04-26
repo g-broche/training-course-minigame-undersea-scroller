@@ -1,5 +1,6 @@
 export class Movable {
     static baseMoveSpeed;
+    static #speedFactor = 1;
     /** @type {{ hitbox: HTMLDivElement|null, sprite: HTMLImageElement|null}} */
     domElement = {
         hitbox: null,
@@ -89,32 +90,45 @@ export class Movable {
     getBoundaries() {
         return this.positions.boundaries
     }
+    getSpeedFactor() {
+        return Movable.#speedFactor;
+    }
+    move() {
+        const speedFactor = this.getSpeedFactor()
+        this.positions.posX += this.moveSpeed.x * speedFactor;
+        this.positions.posY += this.moveSpeed.y * speedFactor;
+        this.setBoundaries()
+    }
     moveUp() {
-        if (this.positions.boundaries.top - this.moveSpeed.y < 0) {
+        const speedFactor = this.getSpeedFactor()
+        if ((this.positions.boundaries.top - (this.moveSpeed.y * speedFactor)) < 0) {
             return;
         }
-        this.positions.posY -= this.moveSpeed.y;
+        this.positions.posY -= this.moveSpeed.y * speedFactor;
         this.setBoundaries()
     }
     moveRight(boardLimitRight) {
-        if (this.positions.boundaries.right + this.moveSpeed.x > boardLimitRight) {
+        const speedFactor = this.getSpeedFactor()
+        if ((this.positions.boundaries.right + (this.moveSpeed.x * speedFactor)) > boardLimitRight) {
             return;
         }
-        this.positions.posX += this.moveSpeed.x;
+        this.positions.posX += this.moveSpeed.x * speedFactor;
         this.setBoundaries()
     }
     moveDown(boardLimitBottom) {
-        if (this.positions.boundaries.bottom + this.moveSpeed.y > boardLimitBottom) {
+        const speedFactor = this.getSpeedFactor()
+        if ((this.positions.boundaries.bottom + (this.moveSpeed.y * speedFactor)) > boardLimitBottom) {
             return;
         }
-        this.positions.posY += this.moveSpeed.y;
+        this.positions.posY += this.moveSpeed.y * speedFactor;
         this.setBoundaries()
     }
     moveLeft() {
-        if (this.positions.boundaries.left - this.moveSpeed.x < 0) {
+        const speedFactor = this.getSpeedFactor()
+        if ((this.positions.boundaries.left - (this.moveSpeed.x * speedFactor)) < 0) {
             return;
         }
-        this.positions.posX -= this.moveSpeed.x;
+        this.positions.posX -= this.moveSpeed.x * speedFactor;
         this.setBoundaries()
     }
     toggleVisibility(mustBeVisible) {
