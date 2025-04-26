@@ -1,2 +1,3 @@
 import { App } from "./src/scripts/App.js";
-App.run();
+const app = App.getInstance();
+app.run();

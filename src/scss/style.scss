@@ -1,0 +1,33 @@
+@use "./abstract/" as *;
+@use "./elements/" as *;
+@use "./components/" as *;
+
+* {
+    font-size: $font-size-base;
+}
+
+body {
+    width: 100%;
+    min-height: 100vh;
+    padding-bottom: 10vh;
+    background-color: black;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+main {
+    position: relative;
+}
+
+.display-none {
+    display: none !important;
+}
+
+.hidden {
+    visibility: hidden;
+}
+
+.no-scroll {
+    overflow: hidden;
+}

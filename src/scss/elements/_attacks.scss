@@ -1,0 +1,15 @@
+@use "../abstract/" as *;
+
+.projectile {
+    position: absolute;
+}
+
+.shigu-attack {
+    border-radius: 50%;
+    background-color: $color-light-blue;
+}
+
+.enemy-attack {
+    border-radius: 50%;
+    background-color: $color-red;
+}

@@ -1,0 +1,21 @@
+@use "../abstract/" as *;
+
+header#page-header {
+    padding: 2rem;
+    width: 75%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    color: $color-font-base;
+
+    & h1 {
+        font-size: $font-size-biggest;
+    }
+
+    & div#scoreboard {
+        width: 100%;
+        display: flex;
+        justify-content: space-evenly;
+    }
+}

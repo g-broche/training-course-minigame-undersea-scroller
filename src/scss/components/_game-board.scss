@@ -1,0 +1,10 @@
+@use "../abstract/" as *;
+
+#game-board {
+    position: relative;
+    height: $gameboard-height;
+    width: $gameboard-width;
+    background-color: $background-underwater-fixed;
+    background: $background-underwater-gradient;
+    overflow: hidden;
+}
