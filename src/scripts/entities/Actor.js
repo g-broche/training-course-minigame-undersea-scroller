@@ -15,7 +15,7 @@ export class Actor extends Movable {
     framesUntilNextShot = 0;
     #shots = new Map();
     #shotsToDespawn = new Set();
-    constructor({ baseClass, health, atkDamage, shotVelocityFactor, projectileClass, rateOfFire }) {
+    constructor({ baseClass, health, atkDamage, shotVelocityFactor, projectileClass, rateOfFire, speedFactor }) {
         super(baseClass);
         this.#maxHealth = health;
         this.#health = health;
@@ -123,6 +123,7 @@ export class Actor extends Movable {
     }
     takeHit(damageReceived) {
         this.setHealth(this.#health -= damageReceived);
+        console.log(`damage ${damageReceived}, health remaining ${this.#health}`)
     }
     isAlive() {
         return this.#isAlive;

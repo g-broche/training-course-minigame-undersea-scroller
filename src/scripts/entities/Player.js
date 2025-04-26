@@ -3,7 +3,7 @@ import { Actor } from "./Actor.js";
 const PLAYER_CLASS = "player";
 const BASE_HEALTH = 100;
 const ATK_DAMAGE = 30;
-const RATE_OF_FIRE = 60;
+const RATE_OF_FIRE = 90;
 const SHOT_VELOCITY_FACTOR = 1.2;
 const PROJECTILE_CLASS = "shigu-attack"
 

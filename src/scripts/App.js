@@ -34,9 +34,14 @@ export class App {
     #isInitialStart = true;
     #isModalOpen = false;
     #maxSimultaneousEnemies = 5;
+    #spawnCount = 0;
     delayBetweenSpawns = 5;
-    framesUntilNextSpawn = 0;
+    framesUntilNextSpawn = 60;
     #frameRequestId = null;
+    #enemyTypes = [
+        "base",
+        "sharpshooter"
+    ]
     constructor() {
         if (App.#instance) {
             return App.#instance;
@@ -204,14 +209,27 @@ export class App {
         this.player.despawnExpiredShots()
         this.handleEnemyActions()
         this.handleEnemiesProjectileActions()
-        if (this.framesUntilNextSpawn === 0 && this.gameBoard.getLivingEnemyCount() < this.#maxSimultaneousEnemies) {
-            this.gameBoard.addEnemyAtRandom();
-            this.framesUntilNextSpawn = this.delayBetweenSpawns * 60;
-        }
+        this.handleEnemySpawn()
         if (this.#isPlaying && !this.#isPaused) {
             this.#frameRequestId = window.requestAnimationFrame(() => { this.playFrame() });
         }
     }
+    handleEnemySpawn() {
+        if (this.framesUntilNextSpawn === 0 && this.gameBoard.getLivingEnemyCount() < this.#maxSimultaneousEnemies) {
+            this.gameBoard.addEnemyAtRandomPlace(this.pickEnemyTypeToSpawn());
+            this.framesUntilNextSpawn = this.delayBetweenSpawns * 60;
+            this.#spawnCount++
+        }
+    }
+    pickEnemyTypeToSpawn() {
+        if (this.#spawnCount !== 0 && this.#spawnCount % 3 === 0) {
+            console.log(`true, spawning ${this.#enemyTypes[1]}`)
+            return this.#enemyTypes[1]
+        }
+        console.log(`false, spawning ${this.#enemyTypes[0]}`)
+        return this.#enemyTypes[0]
+    }
+
     /**
      * Handles all player related projectile behaviors and checks for a new frame
      */
@@ -266,10 +284,7 @@ export class App {
         for (const [enemyId, enemy] of this.gameBoard.enemies) {
             enemy.reloadNextShot()
             if (this.gameBoard.isPlayerInFrontOfEnemy(enemy)) {
-                const rng = Math.floor(Math.random() * 3) + 1;
-                rng === 3
-                    ? enemy.fireAimedProjectile(this.gameBoard, this.player)
-                    : enemy.fireProjectile(this.gameBoard)
+                enemy.fire(this.gameBoard, this.player)
             }
             enemy.move()
             enemy.ActualizeDisplayLocation()
@@ -294,7 +309,7 @@ export class App {
         const title = document.createElement("h2");
         title.textContent = "GAME OVER"
         const messageOverElement = document.createElement("p");
-        const messageTime = `You survived for ${this.scoreBoard.getSurvivedTimeString()}s`
+        const messageTime = `You survived for ${this.scoreBoard.getSurvivedTimeString()}`
         const messageEnemyCount = `defeated ${this.scoreBoard.getDefeatedEnemyCount()} enemies`
         const messageScore = `reaching a total score of ${this.scoreBoard.getScore()} points`
         const message = `${messageTime} and ${messageEnemyCount} ${messageScore}.`

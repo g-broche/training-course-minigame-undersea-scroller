@@ -1,7 +1,8 @@
-import { BaseEnemy } from "../entities/BaseEnemy.js";
+import { Charger } from "../entities/Charger.js";
 import { Movable } from "../entities/Movable.js";
 import { Player } from "../entities/Player.js";
 import { Projectile } from "../entities/Projectile.js";
+import { Sharpshooter } from "../entities/Sharpshooter.js";
 
 export class GameBoard {
     static #instance = null
@@ -104,9 +105,15 @@ export class GameBoard {
             posY: Math.random() * (this.spawnArea.enemy.yMax - this.spawnArea.enemy.yMin) + this.spawnArea.enemy.yMin
         }
     }
-    addEnemyAtRandom() {
+    createEnemyUnit(enemyType = "base") {
+        if (enemyType === "sharpshooter") {
+            return Sharpshooter.create();
+        }
+        return Charger.create();
+    }
+    addEnemyAtRandomPlace(enemyType) {
         try {
-            const newEnemy = BaseEnemy.createBaseEnemy()
+            const newEnemy = this.createEnemyUnit(enemyType)
             newEnemy.enemy.setSpeed({
                 moveSpeedX: -this.moveSpeedBase,
                 moveSpeedY: 0
