@@ -12,9 +12,8 @@ export class Player extends Actor {
     #speedFactor = 1.25;
     screenWidthtoEntityWidthRatio = 4;
     screenWidthtoEntityHeightRatio = 2;
-    get isFromPlayer() {
-        return true;
-    }
+    get isPlayer() { return true }
+    get getProjectileSizeRatio() { return { width: 1.5, height: 1.5 } }
     constructor() {
         if (Player.#instance) {
             return Player.#instance;

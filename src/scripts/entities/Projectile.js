@@ -4,18 +4,21 @@ export class Projectile extends Movable {
     static projectileIncrementor = 1;
     static baseProjectileVelocity;
     static #speedFactor = 1
-    screenWidthtoEntityWidthRatio = 1.5;
-    screenWidthtoEntityHeightRatio = 1.5;
+    screenWidthtoEntityWidthRatio = null;
+    screenWidthtoEntityHeightRatio = null;
     damage;
     /** @type {Movable} */
     owner = null;
     /** @type {boolean} */
-    isFromPlayer = false;
     constructor({ baseClass, owner, damage = 10, speedX, speedY }) {
+        console.log(owner)
         super(`projectile ${baseClass}`);
         this.owner = owner;
-        this.isFromPlayer = owner.constructor.name === "Player";
+        this.isFromPlayer = owner.isPlayer;
+        console.log()
         this.damage = damage > 0 ? damage : 10;
+        this.screenWidthtoEntityHeightRatio = owner.getProjectileSizeRatio.height
+        this.screenWidthtoEntityWidthRatio = owner.getProjectileSizeRatio.width
         this.setSpeed({
             moveSpeedX: speedX,
             moveSpeedY: speedY

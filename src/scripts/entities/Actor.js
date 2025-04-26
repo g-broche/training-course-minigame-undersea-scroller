@@ -15,6 +15,8 @@ export class Actor extends Movable {
     framesUntilNextShot = 0;
     #shots = new Map();
     #shotsToDespawn = new Set();
+    get isPlayer() { throw new Error("children classes must implement isFromPlayer getter") }
+    get getProjectileSizeRatio() { throw new Error("children classes must implement projectileSizeRatio getter") }
     constructor({ baseClass, health, atkDamage, shotVelocityFactor, projectileClass, rateOfFire, speedFactor }) {
         super(baseClass);
         this.#maxHealth = health;
@@ -43,7 +45,7 @@ export class Actor extends Movable {
             return;
         }
         const projectileVector = Projectile.calculateShotMovement(
-            this.isFromPlayer,
+            this.isPlayer,
             this.#shotVelocityFactor,
             null
         )
@@ -69,7 +71,7 @@ export class Actor extends Movable {
         const deltaToTargetX = target.positions.posX - this.positions.posX
         const deltaToTargetY = target.positions.posY - this.positions.posY
         const deltaCoordsToTarget = { deltaX: deltaToTargetX, deltaY: deltaToTargetY }
-        const projectileVector = Projectile.calculateShotMovement(this.isFromPlayer, this.#shotVelocityFactor, deltaCoordsToTarget)
+        const projectileVector = Projectile.calculateShotMovement(this.isPlayer, this.#shotVelocityFactor, deltaCoordsToTarget)
         const projectileData = Projectile.createProjectile({
             projectileClass: this.getAimedProjectileClass(),
             shooter: this,

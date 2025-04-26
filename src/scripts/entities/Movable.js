@@ -63,6 +63,9 @@ export class Movable {
         this.domElement.hitbox.classList.remove(...classNames);
     }
     setSize(gameBoard) {
+        if (!this.screenWidthtoEntityHeightRatio || !this.screenWidthtoEntityWidthRatio) {
+            throw new Error("Missing screen ratio properties on element when defining sizes", this)
+        }
         const height = gameBoard.calculateRatioPixelFromBoardWidth(this.screenWidthtoEntityHeightRatio);
         const width = gameBoard.calculateRatioPixelFromBoardWidth(this.screenWidthtoEntityWidthRatio);
         this.sizes.height = height

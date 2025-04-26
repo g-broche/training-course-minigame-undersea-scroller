@@ -3,9 +3,8 @@ import { Actor } from "./Actor.js";
 export class Enemy extends Actor {
     static enemyIncrementor = 1;
     #pointValue;
-    get isFromPlayer() {
-        return false;
-    }
+    get isPlayer() { return false }
+    get getProjectileSizeRatio() { throw new Error("children classes must implement projectileSizeRatio getter") }
     constructor({
         baseClass,
         health,

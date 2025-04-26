@@ -11,6 +11,7 @@ export class Charger extends Enemy {
     static #pointValue = 50;
     screenWidthtoEntityWidthRatio = 4;
     screenWidthtoEntityHeightRatio = 4;
+    get getProjectileSizeRatio() { return { width: 1.5, height: 1.5 } }
     constructor() {
         super(Charger.getEnemyTypeSheet());
     }
