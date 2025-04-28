@@ -24,6 +24,7 @@ export class Enemy extends Actor {
             rateOfFire: rateOfFire
         });
         this.#pointValue = pointValue;
+        this.isFacingRight = false;
     }
 
     static create() {

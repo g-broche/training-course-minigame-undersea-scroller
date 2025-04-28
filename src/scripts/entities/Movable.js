@@ -1,10 +1,11 @@
 export class Movable {
     static baseMoveSpeed;
     static #speedFactor = 1;
-    /** @type {{ hitbox: HTMLDivElement|null, sprite: HTMLImageElement|null}} */
+    /** @type {{ hitbox: HTMLDivElement|null, sprite: HTMLImageElement|null, damageOverlay: HTMLDivElement|null}} */
     domElement = {
         hitbox: null,
         sprite: null,
+        damageOverlay: null,
     };
     sizes = {
         width: null,
@@ -16,7 +17,12 @@ export class Movable {
         x: null,
         y: null
     };
-    #baseClass = null
+    #baseClass = null;
+    #animationFrames = null;
+    #currentAnimationFrameIndex = null;
+    #animationIntervalId = null;
+    #animationIntervalDelay = null;
+    #hasAnimation = false;
     positions = {
         posX: null,
         posY: null,
@@ -27,9 +33,13 @@ export class Movable {
             left: null,
         }
     }
+    isFacingRight = null;
     hasHealthBar = false;
     screenWidthtoEntityWidthRatio = 1;
     screenWidthtoEntityHeightRatio = 1;
+    get animationConfig() {
+        return null
+    }
     constructor(baseClass) {
         this.#baseClass = baseClass;
     }
@@ -42,7 +52,7 @@ export class Movable {
     }
     createElement() {
         this.domElement.hitbox = document.createElement("div");
-        this.domElement.hitbox.className = this.#baseClass;
+        this.domElement.hitbox.className = `hitbox ${this.#baseClass}`;
         if (this.hasHealthBar) {
             this.domElement.healthBarContainer = document.createElement("div");
             this.domElement.healthBarContainer.className = "healthbar";
@@ -51,6 +61,7 @@ export class Movable {
             this.domElement.healthBarContainer.appendChild(this.domElement.healthBarHealth)
             this.domElement.hitbox.appendChild(this.domElement.healthBarContainer)
         }
+        this.setAnimationConfig();
         return this.domElement.hitbox;
     }
     removeElement() {
@@ -102,38 +113,7 @@ export class Movable {
         this.positions.posY += this.moveSpeed.y * speedFactor;
         this.setBoundaries()
     }
-    moveUp() {
-        const speedFactor = this.getSpeedFactor()
-        if ((this.positions.boundaries.top - (this.moveSpeed.y * speedFactor)) < 0) {
-            return;
-        }
-        this.positions.posY -= this.moveSpeed.y * speedFactor;
-        this.setBoundaries()
-    }
-    moveRight(boardLimitRight) {
-        const speedFactor = this.getSpeedFactor()
-        if ((this.positions.boundaries.right + (this.moveSpeed.x * speedFactor)) > boardLimitRight) {
-            return;
-        }
-        this.positions.posX += this.moveSpeed.x * speedFactor;
-        this.setBoundaries()
-    }
-    moveDown(boardLimitBottom) {
-        const speedFactor = this.getSpeedFactor()
-        if ((this.positions.boundaries.bottom + (this.moveSpeed.y * speedFactor)) > boardLimitBottom) {
-            return;
-        }
-        this.positions.posY += this.moveSpeed.y * speedFactor;
-        this.setBoundaries()
-    }
-    moveLeft() {
-        const speedFactor = this.getSpeedFactor()
-        if ((this.positions.boundaries.left - (this.moveSpeed.x * speedFactor)) < 0) {
-            return;
-        }
-        this.positions.posX -= this.moveSpeed.x * speedFactor;
-        this.setBoundaries()
-    }
+
     toggleVisibility(mustBeVisible) {
         if (mustBeVisible) {
             this.domElement.hitbox.classList.remove("hidden");
@@ -156,5 +136,71 @@ export class Movable {
         // console.log(`is matching on X ${isMatchingX}, is matching on Y ${isMatchingY}`)
         const isColliding = isMatchingX && isMatchingY;
         return isColliding;
+    }
+    hasAnimation() {
+        return this.#hasAnimation;
+    }
+    setAnimationConfig() {
+        if (this.animationConfig) {
+            this.#animationFrames = this.animationConfig.animationFrames;
+            this.#animationIntervalDelay = this.animationConfig.animationIntervalDelay;
+            this.#hasAnimation = true;
+            this.#currentAnimationFrameIndex = 0;
+            this.domElement.sprite = document.createElement("img");
+            this.domElement.sprite.className = "sprite";
+            this.domElement.sprite.setAttribute("alt", this.constructor.name);
+            this.changeSprite(this.#animationFrames[this.#currentAnimationFrameIndex]);
+            this.domElement.damageOverlay = document.createElement("div");
+            this.domElement.damageOverlay.className = "damage-overlay"
+            this.domElement.hitbox.append(this.domElement.sprite, this.domElement.damageOverlay);
+        } else {
+            this.#hasAnimation = false;
+        }
+    }
+    startAnimation() {
+        if (this.#hasAnimation && this.#animationIntervalId === null) {
+            this.#animationIntervalId = setInterval(() => {
+                const nextFramePath = this.selectNextFrame()
+                this.changeSprite(nextFramePath)
+            }, this.#animationIntervalDelay)
+        }
+    }
+    selectNextFrame() {
+        this.#currentAnimationFrameIndex =
+            this.#currentAnimationFrameIndex >= this.#animationFrames.length - 1
+                ? 0
+                : this.#currentAnimationFrameIndex + 1
+        return this.#animationFrames[this.#currentAnimationFrameIndex]
+    }
+
+    changeSprite(imagePath) {
+        this.domElement.sprite.src = imagePath;
+    }
+
+    pauseAnimation() {
+        console.log(this.#animationIntervalId)
+        if (this.#animationIntervalId !== null) {
+            clearInterval(this.#animationIntervalId)
+            this.#animationIntervalId = null;
+        }
+    }
+
+    resetAnimation() {
+        this.toggleDirectionFlip(false);
+        this.#currentAnimationFrameIndex = 0;
+        this.changeSprite(this.#animationFrames[0])
+        this.startAnimation()
+    }
+
+    toggleDirectionFlip(isNormalDirectionReversed) {
+        if (isNormalDirectionReversed) {
+            this.domElement.hitbox.classList.add("reverse")
+        } else {
+            this.domElement.hitbox.classList.remove("reverse")
+        }
+    }
+    setFacedDirection(mustFaceRight) {
+        this.isFacingRight = mustFaceRight
+        this.toggleDirectionFlip(!mustFaceRight)
     }
 }

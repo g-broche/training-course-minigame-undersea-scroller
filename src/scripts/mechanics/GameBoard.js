@@ -93,6 +93,7 @@ export class GameBoard {
         this.player.setPosition({ posX: this.player.sizes.halfWidth, posY: this.sizes.height / 2 });
         this.player.ActualizeDisplayLocation();
         this.player.toggleVisibility(true)
+        this.player.startAnimation()
     }
     setAllowedEnemySpawnArea() {
         this.spawnArea.enemy.xMin = this.sizes.width * 0.75;
@@ -199,7 +200,7 @@ export class GameBoard {
      * 
      * @param {BaseEnemy} enemy 
      */
-    isPlayerInFrontOfEnemy(enemy) {
+    isPlayerLeftFromEnemy(enemy) {
         return enemy.positions.boundaries.left > this.player.positions.boundaries.right
     }
 }

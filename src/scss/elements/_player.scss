@@ -3,5 +3,7 @@ $placeholder-player-color: rgb(193, 60, 160);
 
 .player {
     position: absolute;
-    background-color: $placeholder-player-color;
+    // background-color: $placeholder-player-color;
+    // background-image: url('./src/assets/img/set-shigu/frame-01.png');
+    background-size: cover;
 }

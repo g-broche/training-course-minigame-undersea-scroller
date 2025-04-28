@@ -53,11 +53,19 @@ export class App {
         this.#isPlaying = bool;
         if (this.#isPlaying) {
             this.instruction.clearInstruction()
+        } else {
+            this.player.pauseAnimation()
         }
     }
     setIsPause(bool) {
         this.#isPaused = bool;
-        this.#isPaused ? this.instruction.displayPauseMessage() : this.instruction.clearInstruction()
+        if (this.#isPaused) {
+            this.instruction.displayPauseMessage()
+            this.player.pauseAnimation()
+        } else {
+            this.instruction.clearInstruction()
+            this.player.startAnimation()
+        }
     }
     static getInstance() {
         if (!App.#instance) {
@@ -154,7 +162,6 @@ export class App {
         window.addEventListener("resize", throttleWithDebounce(() => {
             this.#isPlaying = false;
             this.stopGame();
-            console.log("test");
             this.gameBoard.initialize("game-board");
             this.playRound();
         }, 1000, 1200))
@@ -271,7 +278,6 @@ export class App {
                     this.player.takeHit(projectile.damage)
                     this.queueProjectileForDeletion({ projectileId: projectileId, projectile: projectile })
                     if (!this.player.isAlive()) {
-                        this.setIsPlaying(false)
                         this.handleGameOver();
                     }
                 }
@@ -288,9 +294,12 @@ export class App {
     handleEnemyActions() {
         for (const [enemyId, enemy] of this.gameBoard.enemies) {
             enemy.reloadNextShot()
-            if (this.gameBoard.isPlayerInFrontOfEnemy(enemy)) {
-                enemy.fire(this.gameBoard, this.player)
+            if (this.gameBoard.isPlayerLeftFromEnemy(enemy)) {
+                enemy.setFacedDirection(false)
+            } else {
+                enemy.setFacedDirection(true)
             }
+            enemy.fire(this.gameBoard, this.player)
             enemy.move()
             enemy.ActualizeDisplayLocation()
             if (this.gameBoard.isOutOfBounds(enemy)) {
@@ -347,6 +356,7 @@ export class App {
         } else {
             this.gameBoard.reset();
         }
+        this.player.resetAnimation()
     }
 
     stopGame() {

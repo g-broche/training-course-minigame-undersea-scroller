@@ -11,11 +11,9 @@ export class Projectile extends Movable {
     owner = null;
     /** @type {boolean} */
     constructor({ baseClass, owner, damage = 10, speedX, speedY }) {
-        console.log(owner)
         super(`projectile ${baseClass}`);
         this.owner = owner;
         this.isFromPlayer = owner.isPlayer;
-        console.log()
         this.damage = damage > 0 ? damage : 10;
         this.screenWidthtoEntityHeightRatio = owner.getProjectileSizeRatio.height
         this.screenWidthtoEntityWidthRatio = owner.getProjectileSizeRatio.width
@@ -34,9 +32,7 @@ export class Projectile extends Movable {
      */
     static calculateShotMovement(isFromPlayer = false, shotVelocityFactor, deltaCoordsToTarget = null) {
         if (!deltaCoordsToTarget) {
-            const moveSpeedX = isFromPlayer
-                ? shotVelocityFactor * Projectile.baseProjectileVelocity
-                : shotVelocityFactor * Projectile.baseProjectileVelocity * -1
+            const moveSpeedX = shotVelocityFactor * Projectile.baseProjectileVelocity
             const moveSpeedY = 0
             return {
                 moveSpeedX: moveSpeedX,
@@ -86,7 +82,7 @@ export class Projectile extends Movable {
         this.toggleVisibility(false)
         gameBoard.domElements.board.appendChild(this.domElement.hitbox)
         this.setSize(gameBoard)
-        const originX = this.isFromPlayer
+        const originX = this.owner.isFacingRight
             ? this.owner.positions.boundaries.right + this.sizes.halfWidth
             : this.owner.positions.boundaries.left - this.sizes.halfWidth;
         const originY = this.owner.positions.posY;

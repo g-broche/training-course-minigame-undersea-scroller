@@ -17,7 +17,7 @@ export class Actor extends Movable {
     #shotsToDespawn = new Set();
     get isPlayer() { throw new Error("children classes must implement isFromPlayer getter") }
     get getProjectileSizeRatio() { throw new Error("children classes must implement projectileSizeRatio getter") }
-    constructor({ baseClass, health, atkDamage, shotVelocityFactor, projectileClass, rateOfFire, speedFactor }) {
+    constructor({ baseClass, health, atkDamage, shotVelocityFactor, projectileClass, rateOfFire }) {
         super(baseClass);
         this.#maxHealth = health;
         this.#health = health;
@@ -53,7 +53,7 @@ export class Actor extends Movable {
             projectileClass: this.#projectileClass,
             shooter: this,
             projectileDamage: this.#atkDamage,
-            projectileSpeedX: projectileVector.moveSpeedX,
+            projectileSpeedX: this.isFacingRight ? projectileVector.moveSpeedX : -projectileVector.moveSpeedX,
             projectileSpeedY: projectileVector.moveSpeedY,
         });
         this.#shots.set(projectileData.id, projectileData.projectile);
@@ -125,10 +125,6 @@ export class Actor extends Movable {
     }
     takeHit(damageReceived) {
         this.setHealth(this.#health -= damageReceived);
-        this.domElement.hitbox.classList.add("damage-flash");
-        setTimeout(() => {
-            this.domElement.hitbox.classList.remove("damage-flash");
-        }, 300)
     }
     isAlive() {
         return this.#isAlive;

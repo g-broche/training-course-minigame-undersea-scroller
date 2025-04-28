@@ -9,8 +9,8 @@ export class Sharpshooter extends Enemy {
     static #projectileClass = "enemy-attack sharpshooter-attack";
     static #speedFactor = 0;
     static #pointValue = 100;
-    screenWidthtoEntityWidthRatio = 3;
-    screenWidthtoEntityHeightRatio = 2;
+    screenWidthtoEntityWidthRatio = 4;
+    screenWidthtoEntityHeightRatio = 2.5;
     get getProjectileSizeRatio() { return { width: 2, height: 1 } }
     constructor() {
         super(Sharpshooter.getEnemyTypeSheet());
