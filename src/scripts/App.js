@@ -1,7 +1,7 @@
 /*
 TO DO :
-    handle window resizing (okay between round, throw error during round)
-    add visual assets
+    make reverse only affect sprite
+    add visual assets enemy
 */
 
 
@@ -166,6 +166,9 @@ export class App {
             this.playRound();
         }, 1000, 1200))
         window.addEventListener("keydown", (e) => {
+            if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.key)) {
+                e.preventDefault();
+            }
             if (!this.#isInitialized || this.#isModalOpen === true) {
                 return
             }

@@ -2,6 +2,9 @@ import { Movable } from "./Movable.js";
 import { Player } from "./Player.js";
 import { Projectile } from "./Projectile.js";
 
+/**
+ * Mother class of player and enemies
+ */
 export class Actor extends Movable {
     #maxHealth;
     #health;
@@ -17,6 +20,7 @@ export class Actor extends Movable {
     #shotsToDespawn = new Set();
     get isPlayer() { throw new Error("children classes must implement isFromPlayer getter") }
     get getProjectileSizeRatio() { throw new Error("children classes must implement projectileSizeRatio getter") }
+
     constructor({ baseClass, health, atkDamage, shotVelocityFactor, projectileClass, rateOfFire }) {
         super(baseClass);
         this.#maxHealth = health;
@@ -26,6 +30,10 @@ export class Actor extends Movable {
         this.#projectileClass = projectileClass;
         this.#shotVelocityFactor = shotVelocityFactor;
     }
+    /**
+     * 
+     * @returns dom classname of the projectile
+     */
     getAimedProjectileClass() {
         return this.aimedProjectileClass ? this.aimedProjectileClass : this.#projectileClass
     }

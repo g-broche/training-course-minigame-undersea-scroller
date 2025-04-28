@@ -193,10 +193,13 @@ export class Movable {
     }
 
     toggleDirectionFlip(isNormalDirectionReversed) {
+        if (!this.domElement.sprite) {
+            return
+        }
         if (isNormalDirectionReversed) {
-            this.domElement.hitbox.classList.add("reverse")
+            this.domElement.sprite.classList.add("reverse")
         } else {
-            this.domElement.hitbox.classList.remove("reverse")
+            this.domElement.sprite.classList.remove("reverse")
         }
     }
     setFacedDirection(mustFaceRight) {

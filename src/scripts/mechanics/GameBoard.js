@@ -63,9 +63,10 @@ export class GameBoard {
         for (let [enemyId, enemy] of this.enemies) {
             enemy.clearAllProjectiles();
             enemy.removeFromDom();
-            enemy = null
+            enemy = null;
         }
-        this.enemies.clear()
+        this.enemies.clear();
+        this.player.clearAllProjectiles();
     }
     getLivingEnemyCount() {
         return Array.from(this.enemies.values()).filter((enemy) => enemy.isAlive()).length;
