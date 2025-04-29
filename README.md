@@ -9,6 +9,8 @@ Visual assets used for the various sprites are self-made.
 
 ## Gameplay
 
+Game can be tested through [github pages](https://g-broche.github.io/training-course-minigame-undersea-scroller/) 
+
 Player controls are displayed below game area and on screen instruction will guide you through the process. Currently only keyboard inputs are supported.
 
 The player must survive for as long as possible by dodging enemy attacks while also preventing any enemy from reaching the left side of the screen which would cause instant defeat.
