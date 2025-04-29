@@ -59,6 +59,11 @@ export class Player extends Actor {
         }
         return Player.#instance;
     }
+    /**
+     * Sets invincibility to true or false, if set to true will also update invincibility frames left to
+     * max amount. Will toggle the invincibility animation on or off depending on new state.
+     * @param {boolean} mustBecomeInvicible 
+     */
     setIsInvicible(mustBecomeInvicible) {
         this.#isInvicible = mustBecomeInvicible
         if (this.#isInvicible) { this.#framesOfInvincibilityLeft = Player.#invincibilityFramesAfterHit }
@@ -132,11 +137,18 @@ export class Player extends Actor {
         this.setBoundaries();
         this.setFacedDirection(false);
     }
+    /**
+     * Adds or removes the invincibility animation related class
+     */
     toggleInvincibilityFrameAnimation() {
         this.#isInvicible ?
             this.domElement.sprite.classList.add("invincible")
             : this.domElement.sprite.classList.remove("invincible")
     }
+    /**
+     * Decrease entity health by given amount and also apply invincibility
+     * @param {number} damageReceived 
+     */
     takeHit(damageReceived) {
         if (!this.#isInvicible) {
             this.setHealth(this.getHealth() - damageReceived);
@@ -145,6 +157,9 @@ export class Player extends Actor {
             }
         }
     }
+    /**
+     * reset entity properties to initial state
+     */
     resetToInitialState() {
         this.clearAllProjectiles();
         this.#framesOfInvincibilityLeft = 0;
