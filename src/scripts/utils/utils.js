@@ -1,16 +1,12 @@
-export const throttle = (callback, delay) => {
-    let shouldWait = false;
-    return function () {
-        if (!shouldWait) {
-            callback();
-            shouldWait = true;
-            setTimeout(() => {
-                shouldWait = false;
-            }, delay);
-        }
-    };
-}
-
+/**
+ * Throttle function to reduce triggered actions on events with many calls (in this case resize event)
+ * will also triggered a last time to account for last interval not capturing the latest state by using
+ * a final timeout
+ * @param {*} callback 
+ * @param {number} throttleDelay 
+ * @param {number} debounceDelay 
+ * @returns 
+ */
 export function throttleWithDebounce(callback, throttleDelay = 200, debounceDelay = 500) {
     let lastExec = 0;
     let debounceTimer = null;

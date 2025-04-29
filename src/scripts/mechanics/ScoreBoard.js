@@ -1,5 +1,7 @@
 import { InitializationError } from "./Errors.js";
-
+/**
+ * Singleton managing scoreboard data
+ */
 export class ScoreBoard {
     static #instance = null;
     #clockIntervalId = null;
@@ -26,6 +28,10 @@ export class ScoreBoard {
         }
         return ScoreBoard.#instance;
     }
+    /**
+     * Gets the dom elements required for the class to display data
+     * @param {string} scoreBoardContainerId 
+     */
     initialize(scoreBoardContainerId) {
         try {
             this.domElements.container = document.getElementById(scoreBoardContainerId)
@@ -49,6 +55,10 @@ export class ScoreBoard {
     getScore() {
         return this.#score;
     }
+    /**
+     * increase score and refresh display
+     * @param {number} pointsToAdd 
+     */
     increaseScore(pointsToAdd) {
         this.#score += pointsToAdd;
         this.refreshScoreDisplay()
@@ -59,6 +69,9 @@ export class ScoreBoard {
     getDefeatedEnemyCount() {
         return this.#defeatedEnemies;
     }
+    /**
+     * increment the counter of defeated enemies by one and refresh the related display
+     */
     incrementDefeatedEnemyCounter() {
         this.#defeatedEnemies++;
         this.refreshDefeatedEnemyCounter();
@@ -66,10 +79,17 @@ export class ScoreBoard {
     refreshDefeatedEnemyCounter() {
         this.domElements.enemiesDefeatedDisplay.innerText = this.#defeatedEnemies;
     }
+    /**
+     * increment time survived counter and refresh the related display
+     */
     incrementTimeCounter() {
         this.#timeSurvived++;
         this.refreshSurvivedTime();
     }
+    /**
+     * 
+     * @returns {string} time survived in a more user friendly format than second elapsed
+     */
     getSurvivedTimeString() {
         const minutes = Math.floor(this.#timeSurvived / 60).toString()
         const seconds = (this.#timeSurvived % 60).toString()
@@ -78,15 +98,25 @@ export class ScoreBoard {
     refreshSurvivedTime() {
         this.domElements.timeDisplay.innerText = this.getSurvivedTimeString()
     }
+    /**
+     * start clock interval to count survived seconds
+     */
     startClock() {
         this.#clockIntervalId = setInterval(() => {
             this.incrementTimeCounter();
         }, 1000)
     }
+
+    /**
+     * cancel clock ticking interval
+     */
     stopClock() {
         clearInterval(this.#clockIntervalId)
         this.#clockIntervalId = null
     }
+    /**
+     * set all score values to 0 for new round start
+     */
     resetScore() {
         this.#score = 0;
         this.#defeatedEnemies = 0;

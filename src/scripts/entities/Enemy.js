@@ -1,5 +1,7 @@
 import { Actor } from "./Actor.js";
-
+/**
+ * Parent class of all enemy types
+ */
 export class Enemy extends Actor {
     static enemyIncrementor = 1;
     #pointValue;
@@ -39,6 +41,10 @@ export class Enemy extends Actor {
         throw new Error("Method 'getSpeedFactor' must be implemented by children classes")
     }
 
+    /**
+     * 
+     * @returns point value of this unit
+     */
     getPointValue() {
         return this.#pointValue;
     }

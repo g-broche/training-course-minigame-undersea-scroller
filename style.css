@@ -16,6 +16,7 @@
   }
 }
 .sprite {
+  position: absolute;
   object-fit: cover;
   width: 100%;
 }
@@ -31,7 +32,7 @@
 
 .enemy {
   position: absolute;
-  background-color: rgb(110, 16, 86);
+  background-size: cover;
 }
 
 .projectile {
@@ -40,7 +41,6 @@
 
 .shigu-attack {
   border-radius: 50%;
-  background-color: lightblue;
 }
 
 .enemy-attack {
@@ -67,7 +67,7 @@
   height: 40vw;
   width: 80vw;
   background-color: #136b52;
-  background: linear-gradient(0deg, rgb(19, 107, 82) 0%, rgb(25, 141, 176) 25%, rgb(41, 165, 196) 49%, rgb(51, 193, 212) 75%, rgb(121, 228, 242) 100%);
+  background: linear-gradient(0deg, rgba(38, 123, 60, 0.9) 0%, rgb(52, 80, 164) 25%, rgb(76, 90, 198) 49%, rgb(99, 129, 220) 75%, rgb(106, 173, 232) 100%);
   overflow: hidden;
 }
 
@@ -152,6 +152,26 @@ header#page-header div#scoreboard {
   animation-iteration-count: infinite;
 }
 
+footer {
+  width: 100%;
+  padding: 3rem 20%;
+  color: rgb(123, 185, 235);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+}
+footer ul {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+footer ul li {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+}
+
 * {
   font-size: 1.25rem;
 }
@@ -159,7 +179,6 @@ header#page-header div#scoreboard {
 body {
   width: 100%;
   min-height: 100vh;
-  padding-bottom: 10vh;
   background-color: black;
   display: flex;
   flex-direction: column;

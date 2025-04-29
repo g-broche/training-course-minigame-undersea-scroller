@@ -7,6 +7,9 @@ const RATE_OF_FIRE = 90;
 const SHOT_VELOCITY_FACTOR = 1.2;
 const PROJECTILE_CLASS = "shigu-attack"
 
+/**
+ * Player class used as a singleton
+ */
 export class Player extends Actor {
     static #instance = null;
     static #frames = [
@@ -19,6 +22,9 @@ export class Player extends Actor {
     ]
     static #animationDelay = 200
     #speedFactor = 1.25;
+    /**
+     * return animation config data
+     */
     get animationConfig() {
         return {
             animationFrames: Player.#frames,
@@ -50,9 +56,16 @@ export class Player extends Actor {
         }
         return Player.#instance;
     }
+    /**
+     * 
+     * @returns speed factor of the player
+     */
     getSpeedFactor() {
         return this.#speedFactor;
     }
+    /**
+     * Move player position up
+     */
     moveUp() {
         const speedFactor = this.getSpeedFactor()
         if ((this.positions.boundaries.top - (this.moveSpeed.y * speedFactor)) < 0) {
@@ -61,6 +74,9 @@ export class Player extends Actor {
         this.positions.posY -= this.moveSpeed.y * speedFactor;
         this.setBoundaries()
     }
+    /**
+    * Move player position right and adjust faced direction
+    */
     moveRight(boardLimitRight) {
         const speedFactor = this.getSpeedFactor()
         if ((this.positions.boundaries.right + (this.moveSpeed.x * speedFactor)) > boardLimitRight) {
@@ -70,6 +86,9 @@ export class Player extends Actor {
         this.setBoundaries();
         this.setFacedDirection(true);
     }
+    /**
+    * Move player position down
+    */
     moveDown(boardLimitBottom) {
         const speedFactor = this.getSpeedFactor()
         if ((this.positions.boundaries.bottom + (this.moveSpeed.y * speedFactor)) > boardLimitBottom) {
@@ -78,6 +97,9 @@ export class Player extends Actor {
         this.positions.posY += this.moveSpeed.y * speedFactor;
         this.setBoundaries();
     }
+    /**
+    * Move player position right and adjust faced direction
+    */
     moveLeft() {
         const speedFactor = this.getSpeedFactor()
         if ((this.positions.boundaries.left - (this.moveSpeed.x * speedFactor)) < 0) {

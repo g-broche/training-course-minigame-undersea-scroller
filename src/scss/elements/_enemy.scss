@@ -1,9 +1,6 @@
 @use "../abstract/" as *;
-$placeholder-enemy-color: rgb(110, 16, 86);
 
 .enemy {
     position: absolute;
-    // width: $enemy-hitbox-width;
-    // height: $enemy-hitbox-height;
-    background-color: $placeholder-enemy-color;
+    background-size: cover;
 }

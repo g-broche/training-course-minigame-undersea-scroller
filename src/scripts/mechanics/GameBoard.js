@@ -1,10 +1,14 @@
 import { Charger } from "../entities/Charger.js";
+import { Enemy } from "../entities/Enemy.js";
 import { Movable } from "../entities/Movable.js";
 import { Player } from "../entities/Player.js";
 import { Projectile } from "../entities/Projectile.js";
 import { Sharpshooter } from "../entities/Sharpshooter.js";
 import { Tank } from "../entities/Tank.js";
 
+/**
+ * Gameboard singleton represent the area in play during the game
+ */
 export class GameBoard {
     static #instance = null
     /** @type {{ board: HTMLDivElement }} */
@@ -42,6 +46,10 @@ export class GameBoard {
         }
         return GameBoard.#instance;
     }
+    /**
+     * initialize class properties based on size 
+     * @param {*} boardId 
+     */
     initialize(boardId) {
         this.domElements.board = document.getElementById(boardId);
         this.sizes.height = this.domElements.board.offsetHeight;
@@ -51,15 +59,27 @@ export class GameBoard {
         Projectile.setBaseProjectileVelocity(this.moveSpeedBase * 1.25)
         Movable.setBaseMoveSpeed(this.moveSpeedBase);
     }
+    /**
+     * given a ratio will return the amount of pixel equal to ratio% of board's width
+     * @param {number} ratio 
+     * @returns {number} pixel amount
+     */
     calculateRatioPixelFromBoardWidth(ratio) {
         return this.sizes.width / 100 * ratio
     }
+    /**
+     * given a ratio will return the amount of pixel equal to ratio% of board's height
+     * @param {number} ratio 
+     * @returns {number} pixel amount
+     */
     calculateRatioPixelFromBoardHeight(ratio) {
         return this.sizes.height / 100 * ratio
     }
+
+    /**
+     * Reset board to initial start of round state
+     */
     reset() {
-        this.player.restoreToFullHealth();
-        this.respawnPlayer();
         for (let [enemyId, enemy] of this.enemies) {
             enemy.clearAllProjectiles();
             enemy.removeFromDom();
@@ -67,16 +87,32 @@ export class GameBoard {
         }
         this.enemies.clear();
         this.player.clearAllProjectiles();
+        this.player.restoreToFullHealth();
+        this.respawnPlayer();
     }
+    /**
+     * get the number of alive enemies. Important for handling max spawn logic since enemies
+     * are not remove instantly on death to avoid null pointer reference while their projectiles
+     * are still in play
+     * @returns {number}
+     */
     getLivingEnemyCount() {
         return Array.from(this.enemies.values()).filter((enemy) => enemy.isAlive()).length;
     }
+    /**
+     * 
+     * @returns {right: number, bottom: number} right and bottom boundaries of the gameboard
+     * corresponding to its width and height values.
+     */
     getBoundaries() {
         return {
             right: this.domElements.board.offsetWidth,
             bottom: this.domElements.board.offsetHeight,
         }
     }
+    /**
+     * Add player to the board both in the board property and in the dom
+     */
     addPlayer() {
         this.player = Player.getInstance();
         this.player.setSpeed({
@@ -90,24 +126,40 @@ export class GameBoard {
         this.respawnPlayer()
 
     }
+    /**
+     * respawn player to initial start position and restart animation
+     */
     respawnPlayer() {
         this.player.setPosition({ posX: this.player.sizes.halfWidth, posY: this.sizes.height / 2 });
         this.player.ActualizeDisplayLocation();
         this.player.toggleVisibility(true)
         this.player.startAnimation()
     }
+    /**
+     * define spawn allowed areas on the right side for spawning enemies
+     */
     setAllowedEnemySpawnArea() {
-        this.spawnArea.enemy.xMin = this.sizes.width * 0.75;
+        this.spawnArea.enemy.xMin = this.sizes.width * 0.80;
         this.spawnArea.enemy.xMax = this.sizes.width * 0.95;
         this.spawnArea.enemy.yMax = this.sizes.height * 0.90;
         this.spawnArea.enemy.yMin = this.sizes.height * 0.10;
     }
+
+    /**
+     * Pick a coordinate inside the allowed enemy spawn area
+     * @returns {posX: number, posY: number} spawn location set at random inside the allowed spawn area
+     */
     setRandomSpawnLocation() {
         return {
             posX: Math.random() * (this.spawnArea.enemy.xMax - this.spawnArea.enemy.xMin) + this.spawnArea.enemy.xMin,
             posY: Math.random() * (this.spawnArea.enemy.yMax - this.spawnArea.enemy.yMin) + this.spawnArea.enemy.yMin
         }
     }
+    /**
+     * creates a new enemy instance
+     * @param {string} enemyType keyname of enemy type "tank" or "sharpshooter", default to "charger"
+     * @returns 
+     */
     createEnemyUnit(enemyType) {
         if (enemyType === "tank") {
             return Tank.create();
@@ -117,17 +169,24 @@ export class GameBoard {
         }
         return Charger.create();
     }
-    addEnemyAtRandomPlace(enemyType) {
+    /**
+     * Adds new enemy to the board while actively prevent spawn collision
+     * @param {string} enemyType used for special enemies ("sharpshooter" and "tank")
+     * @returns 
+     */
+    addEnemyAtRandomPlace(enemyType = null) {
         try {
+            // creates new enemy based on type
             const newEnemy = this.createEnemyUnit(enemyType)
             newEnemy.enemy.setSpeed({
                 moveSpeedX: -this.moveSpeedBase,
                 moveSpeedY: 0
             })
+            // creates dom element of new enemy adds it to the dom
             const newEnemyElement = newEnemy.enemy.createElement()
             newEnemy.enemy.toggleVisibility(false)
-            this.domElements.board.append(newEnemyElement);
             newEnemy.enemy.setSize(this)
+            this.domElements.board.append(newEnemyElement);
             const randomCoords = this.setRandomSpawnLocation()
             newEnemy.enemy.setPosition(randomCoords);
             let spawnRetry = 0;
@@ -149,6 +208,11 @@ export class GameBoard {
             }
             this.enemies.set(newEnemy.id, newEnemy.enemy)
             newEnemy.enemy.ActualizeDisplayLocation();
+            if (this.isPlayerLeftFromEnemy(newEnemy.enemy)) {
+                newEnemy.enemy.setFacedDirection(false)
+            } else {
+                newEnemy.enemy.setFacedDirection(true)
+            }
             newEnemy.enemy.toggleVisibility(true)
             // console.log(`********* New enemy was added `);
 
@@ -157,8 +221,9 @@ export class GameBoard {
         }
     }
     /**
-     * 
+     * Checks if a movable is colliding with any actor
      * @param {Movable} movable 
+     * @return {boolean} true if collision, false otherwise
      */
     isCollidingWithExistingActorsOnSpawn(movable) {
         if (movable.hasCollisionWith(this.player)) {
@@ -171,9 +236,17 @@ export class GameBoard {
         })
     }
 
+    /**
+     * Queues enemy for despawn
+     * @param {number} enemyId 
+     */
     addEnemyToDespawnList(enemyId) {
         this.#enemiesToDespawn.add(enemyId)
     }
+    /**
+     * despawn enemies in despawn queue if they don't have any live shot in play to
+     * prevent null pointers
+     */
     clearDeadEnemies() {
         for (const enemyId of this.#enemiesToDespawn) {
             let enemyToDelete = this.enemies.get(enemyId);
@@ -181,6 +254,7 @@ export class GameBoard {
                 enemyToDelete.removeFromDom();
                 if (!enemyToDelete.hasLiveShots()) {
                     enemyToDelete = null
+                    // adding despawned enemy id to set to then remove this enemyId from despawn queue
                     this.#cleanedEnemiesId.add(enemyId)
                     this.enemies.delete(enemyId)
                 }
@@ -191,6 +265,11 @@ export class GameBoard {
         }
         this.#cleanedEnemiesId.clear()
     }
+    /**
+     * Checks if a Movable instance is out of the gameboard
+     * @param {*} movable 
+     * @returns true if out of bounds, false otherwise
+     */
     isOutOfBounds(movable) {
         return movable.positions.boundaries.top > this.sizes.height
             || movable.positions.boundaries.left > this.sizes.width
@@ -198,8 +277,9 @@ export class GameBoard {
             || movable.positions.boundaries.right < 0
     }
     /**
-     * 
-     * @param {BaseEnemy} enemy 
+     * evaluates horizontal position of the player relative to an enemy
+     * @param {Enemy} enemy
+     * @returns {boolean} true if player is left of given entity, false otherwise
      */
     isPlayerLeftFromEnemy(enemy) {
         return enemy.positions.boundaries.left > this.player.positions.boundaries.right

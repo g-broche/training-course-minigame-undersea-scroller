@@ -1,19 +1,23 @@
 /*
 TO DO :
-    make reverse only affect sprite
-    add visual assets enemy
+    correct visual asset for tank
+    tweak difficulty
+    add rules and keymaps
 */
 
 
 import { Player } from "./entities/Player.js";
+import { Projectile } from "./entities/Projectile.js";
 import { Controller } from "./mechanics/Controller.js";
-import { InitializationError } from "./mechanics/Errors.js";
 import { GameBoard } from "./mechanics/GameBoard.js"
 import { Instruction } from "./mechanics/Instruction.js";
 import { Modal } from "./mechanics/Modal.js";
 import { ScoreBoard } from "./mechanics/ScoreBoard.js";
 import { throttleWithDebounce } from "./utils/utils.js";
 
+/**
+ * Singleton encompassing the whole App logic
+ */
 export class App {
     static #instance = null;
     /** @type { GameBoard } */
@@ -49,6 +53,16 @@ export class App {
         }
         App.#instance = this;
     }
+    static getInstance() {
+        if (!App.#instance) {
+            App.#instance = new App();
+        }
+        return App.#instance;
+    }
+    /**
+     * set if the game is in play or standby mode and handle side effects related to that state
+     * @param {boolean} bool 
+     */
     setIsPlaying(bool) {
         this.#isPlaying = bool;
         if (this.#isPlaying) {
@@ -57,6 +71,10 @@ export class App {
             this.player.pauseAnimation()
         }
     }
+    /**
+     * set if the game is live or in pause and handle side effects related to that state
+     * @param {boolean} bool 
+     */
     setIsPause(bool) {
         this.#isPaused = bool;
         if (this.#isPaused) {
@@ -67,14 +85,8 @@ export class App {
             this.player.startAnimation()
         }
     }
-    static getInstance() {
-        if (!App.#instance) {
-            App.#instance = new App();
-        }
-        return App.#instance;
-    }
     /**
-     * decrements frames until next enemy spawn if necessary
+     * Decrements frames until next enemy spawn if necessary
      * 
      */
     reloadNextSpawn() {
@@ -87,7 +99,7 @@ export class App {
         }
     }
     /**
-     * takes inputed keys from Controller to associate the action to execute and actualize the user display
+     * Takes inputed keys from Controller to associate the action to execute and actualize the user display
      */
     consumeActions() {
         for (const action of this.controller.getActionsToExecute()) {
@@ -96,8 +108,8 @@ export class App {
         this.player.ActualizeDisplayLocation();
     }
     /**
-     * for a given action execute the associated behavior
-     * @param {*} action 
+     * For a given action execute the associated behavior
+     * @param {string} action 
      */
     handleAction(action) {
         switch (action) {
@@ -122,7 +134,7 @@ export class App {
         }
     }
     /**
-     * handle pausing and resuming game and associated side effects 
+     * Handles pausing and resuming game and associated side effects 
      */
     togglePause() {
         this.setIsPause(!this.#isPaused);
@@ -136,6 +148,10 @@ export class App {
         this.stopGame()
         console.log("pausing game");
     }
+
+    /**
+     * initializethe various Singletons required for the App to run
+     */
     InitializeComponents() {
         this.gameBoard = GameBoard.getInstance();
         this.gameBoard.initialize("game-board");
@@ -166,7 +182,9 @@ export class App {
             this.playRound();
         }, 1000, 1200))
         window.addEventListener("keydown", (e) => {
-            if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.key)) {
+            // disable default browser events on game keys to not conflict with gameplay
+            if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "Enter", "Space"].includes(e.code)) {
+                console.log("prevented")
                 e.preventDefault();
             }
             if (!this.#isInitialized || this.#isModalOpen === true) {
@@ -225,6 +243,9 @@ export class App {
             this.#frameRequestId = window.requestAnimationFrame(() => { this.playFrame() });
         }
     }
+    /**
+     * Spawns new enemy if the timing is right and put spawning on cooldown for required duration
+     */
     handleEnemySpawn() {
         if (this.framesUntilNextSpawn === 0 && this.gameBoard.getLivingEnemyCount() < this.#maxSimultaneousEnemies) {
             this.gameBoard.addEnemyAtRandomPlace(this.pickEnemyTypeToSpawn());
@@ -232,6 +253,10 @@ export class App {
             this.#spawnCount++
         }
     }
+    /**
+     * Pick an enemy type to spawn based on current spawn count
+     * @returns {string} string of enemy type
+     */
     pickEnemyTypeToSpawn() {
         if (this.#spawnCount !== 0 && this.#spawnCount % 5 === 0) {
             return this.#enemyTypes[2]
@@ -244,11 +269,15 @@ export class App {
 
     /**
      * Handles all player related projectile behaviors and checks for a new frame
+     * 
+     * 
      */
     handlePlayerProjectileActions() {
+        // for each shot, moves projectile
         for (let [projectileId, projectile] of this.player.getShots()) {
             projectile.move();
             projectile.ActualizeDisplayLocation();
+            // checks if enemy is hit and handles such case
             for (let [enemyId, enemy] of this.gameBoard.enemies) {
                 if (!enemy.isAlive()) {
                     break;
@@ -264,6 +293,7 @@ export class App {
                     break;
                 }
             }
+            // queue projectile for despawn if out of board
             if (this.gameBoard.isOutOfBounds(projectile)) {
                 this.queueProjectileForDeletion({ projectileId: projectileId, projectile: projectile })
             }
@@ -313,13 +343,17 @@ export class App {
     }
     /**
      * Put an obsolete projectile into a disposal queue to prepare it for removal from the game.
-     * @param {*} param0 
+     * @param {{ projectileId: number, projectile: Projectile }} param0 
      */
     queueProjectileForDeletion({ projectileId, projectile }) {
         projectile.removeFromDom();
         projectile.owner.addShotsToDespawner(projectileId);
         projectile = null;
     }
+    /**
+     * creates dom content intended to be displayed in the modal on defeat
+     * @returns {HTMLDivElement}
+     */
     createGameOverWindowContent() {
         const contentWrapper = document.createElement("div");
         contentWrapper.className = "game-over-content";
@@ -336,6 +370,10 @@ export class App {
         contentWrapper.append(title, messageOverElement, messageInstructionElement)
         return contentWrapper;
     }
+
+    /**
+     * Handle methods call related to game over logic
+     */
     handleGameOver() {
         this.stopGame()
         this.setIsPlaying(false);
@@ -345,6 +383,9 @@ export class App {
         this.modal.show();
     }
 
+    /**
+     * reset board to a clean state, respawn player to base position and reset properties to start values
+     */
     ResetGame() {
         this.stopGame()
         this.scoreBoard.stopClock();
@@ -359,9 +400,13 @@ export class App {
         } else {
             this.gameBoard.reset();
         }
+        Projectile.resetProjectileIdIncrementor()
         this.player.resetAnimation()
     }
 
+    /**
+     * stop the game at a given frame in case of pause or game over
+     */
     stopGame() {
         if (this.#frameRequestId !== null) {
             cancelAnimationFrame(this.#frameRequestId);
