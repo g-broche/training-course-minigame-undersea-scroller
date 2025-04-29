@@ -1,8 +1,11 @@
 import { Actor } from "./Actor.js";
-
+/**
+ * Parent class of all enemy types
+ */
 export class Enemy extends Actor {
     static enemyIncrementor = 1;
     #pointValue;
+    #damageOnContact = 25;
     get isPlayer() { return false }
     get getProjectileSizeRatio() { throw new Error("children classes must implement projectileSizeRatio getter") }
     constructor({
@@ -24,6 +27,7 @@ export class Enemy extends Actor {
             rateOfFire: rateOfFire
         });
         this.#pointValue = pointValue;
+        this.isFacingRight = false;
     }
 
     static create() {
@@ -38,6 +42,14 @@ export class Enemy extends Actor {
         throw new Error("Method 'getSpeedFactor' must be implemented by children classes")
     }
 
+    getDamageOnContact() {
+        return this.#damageOnContact;
+    }
+
+    /**
+     * 
+     * @returns point value of this unit
+     */
     getPointValue() {
         return this.#pointValue;
     }

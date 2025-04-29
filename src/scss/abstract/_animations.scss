@@ -12,19 +12,18 @@
     }
 }
 
-.player::after,
-.enemy:after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: red;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.3s;
+.invincible {
+    animation-name: blinking;
+    animation-duration: .5s;
+    animation-iteration-count: infinite;
 }
 
-.player.damage-flash:after,
-.enemy.damage-flash:after {
-    animation: takingDamage 0.5s ease;
-    opacity: 0.7;
+.sprite {
+    position: absolute;
+    object-fit: cover;
+    width: 100%;
+}
+
+.reverse {
+    transform: scaleX(-1);
 }

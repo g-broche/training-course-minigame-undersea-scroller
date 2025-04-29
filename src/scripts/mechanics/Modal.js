@@ -41,7 +41,7 @@ export class Modal {
     }
     /**
      * creates the whole modal structure
-     * @returns array with the dom references of the modal background and the modal window
+     * @returns {HTMLElement[]}array with the dom references of the modal background and the modal window
      */
     createModalStructure() {
         this.domElements.wrapper = document.createElement("div");
@@ -88,7 +88,7 @@ export class Modal {
     }
     /**
      * append a child node to the modal content node
-     * @param {*} domContent 
+     * @param {HTMLElement} domContent 
      */
     appendContent(domContent) {
         this.domElements.content = domContent;

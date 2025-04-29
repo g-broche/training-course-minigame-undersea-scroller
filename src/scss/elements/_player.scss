@@ -1,7 +1,6 @@
 @use "../abstract/" as *;
-$placeholder-player-color: rgb(193, 60, 160);
 
 .player {
     position: absolute;
-    background-color: $placeholder-player-color;
+    background-size: cover;
 }

@@ -1,3 +1,6 @@
+/**
+ * Singleton managing user input logic and related actions
+ */
 export class Controller {
     static #instance = null
     KeyMapping = [
@@ -20,12 +23,24 @@ export class Controller {
         }
         return Controller.#instance
     }
+    /**
+     * adds code of key pressed into the active input key set
+     * @param {*} keyCode 
+     */
     addInput(keyCode) {
         this.#inputedKeyCodes.add(keyCode)
     }
+    /**
+     * removes code of key from the active input key set
+     * @param {*} keyCode 
+     */
     removeInput(keyCode) {
         this.#inputedKeyCodes.delete(keyCode)
     }
+    /**
+     * get all actions to execute depending on currently active keys
+     * @returns {string[]} action to executes
+     */
     getActionsToExecute() {
         return this.KeyMapping
             .filter(({ keys }) => [...keys].some(k => this.#inputedKeyCodes.has(k)))
