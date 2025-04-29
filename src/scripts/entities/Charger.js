@@ -10,7 +10,7 @@ export class Charger extends Enemy {
     static #entityClass = "enemy charger";
     static #projectileClass = "enemy-attack base-attack";
     static #frames = [
-        './src/assets/img/enemies/charger.png',
+        './src/assets/img/enemies/charger.webp',
     ]
     static #animationDelay = null
     static #speedFactor = .15;

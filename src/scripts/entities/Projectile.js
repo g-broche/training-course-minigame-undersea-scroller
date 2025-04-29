@@ -10,7 +10,7 @@ export class Projectile extends Movable {
     screenWidthtoEntityHeightRatio = null;
     damage;
     static #framesPlayerProjectile = [
-        './src/assets/img/projectiles/heart-blue.png',
+        './src/assets/img/projectiles/heart-blue.webp',
     ]
     static #animationDelay = null
     get animationConfig() {

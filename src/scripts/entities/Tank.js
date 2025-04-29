@@ -8,7 +8,7 @@ export class Tank extends Enemy {
     static #entityClass = "enemy tank";
     static #projectileClass = "enemy-attack large-attack";
     static #frames = [
-        './src/assets/img/enemies/tank.png',
+        './src/assets/img/enemies/tank.webp',
     ]
     static #animationDelay = null
     static #speedFactor = .1;

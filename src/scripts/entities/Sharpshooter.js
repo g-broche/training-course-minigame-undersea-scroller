@@ -8,7 +8,7 @@ export class Sharpshooter extends Enemy {
     static #entityClass = "enemy sharpshooter";
     static #projectileClass = "enemy-attack sharpshooter-attack";
     static #frames = [
-        './src/assets/img/enemies/sharpshooter.png',
+        './src/assets/img/enemies/sharpshooter.webp',
     ]
     static #animationDelay = null
     static #speedFactor = 0;

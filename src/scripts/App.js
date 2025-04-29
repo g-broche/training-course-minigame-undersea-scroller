@@ -251,9 +251,9 @@ export class App {
      */
     handleEnemySpawn() {
         if (this.framesUntilNextSpawn === 0 && this.gameBoard.getLivingEnemyCount() < this.#maxSimultaneousEnemies) {
+            this.#spawnCount++
             this.gameBoard.addEnemyAtRandomPlace(this.pickEnemyTypeToSpawn());
             this.framesUntilNextSpawn = this.delayBetweenSpawns * 60;
-            this.#spawnCount++
         }
     }
     /**

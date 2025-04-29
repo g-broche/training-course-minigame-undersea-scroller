@@ -14,12 +14,12 @@ export class Player extends Actor {
     static #instance = null;
     static #invincibilityFramesAfterHit = 120;
     static #frames = [
-        './src/assets/img/set-shigu/frame-01.png',
-        './src/assets/img/set-shigu/frame-02.png',
-        './src/assets/img/set-shigu/frame-03.png',
-        './src/assets/img/set-shigu/frame-04.png',
-        './src/assets/img/set-shigu/frame-05.png',
-        './src/assets/img/set-shigu/frame-06.png'
+        './src/assets/img/set-shigu/frame-01.webp',
+        './src/assets/img/set-shigu/frame-02.webp',
+        './src/assets/img/set-shigu/frame-03.webp',
+        './src/assets/img/set-shigu/frame-04.webp',
+        './src/assets/img/set-shigu/frame-05.webp',
+        './src/assets/img/set-shigu/frame-06.webp'
     ]
     static #animationDelay = 200
     #speedFactor = 1.1;
