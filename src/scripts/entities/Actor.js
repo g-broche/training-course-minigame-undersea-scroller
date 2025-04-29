@@ -130,6 +130,9 @@ export class Actor extends Movable {
             return;
         }
     }
+    getHealth() {
+        return this.#health;
+    }
     /**
      * 
      * @returns map of shots this entity has fired and are still actively in play

@@ -4,7 +4,7 @@ const PLAYER_CLASS = "player";
 const BASE_HEALTH = 100;
 const ATK_DAMAGE = 30;
 const RATE_OF_FIRE = 90;
-const SHOT_VELOCITY_FACTOR = 1.2;
+const SHOT_VELOCITY_FACTOR = 1.1;
 const PROJECTILE_CLASS = "shigu-attack"
 
 /**
@@ -12,6 +12,7 @@ const PROJECTILE_CLASS = "shigu-attack"
  */
 export class Player extends Actor {
     static #instance = null;
+    static #invincibilityFramesAfterHit = 120;
     static #frames = [
         './src/assets/img/set-shigu/frame-01.png',
         './src/assets/img/set-shigu/frame-02.png',
@@ -21,7 +22,9 @@ export class Player extends Actor {
         './src/assets/img/set-shigu/frame-06.png'
     ]
     static #animationDelay = 200
-    #speedFactor = 1.25;
+    #speedFactor = 1.1;
+    #framesOfInvincibilityLeft = 0
+    #isInvicible = false;
     /**
      * return animation config data
      */
@@ -55,6 +58,26 @@ export class Player extends Actor {
             Player.#instance = new Player();
         }
         return Player.#instance;
+    }
+    setIsInvicible(mustBecomeInvicible) {
+        this.#isInvicible = mustBecomeInvicible
+        if (this.#isInvicible) { this.#framesOfInvincibilityLeft = Player.#invincibilityFramesAfterHit }
+        this.toggleInvincibilityFrameAnimation()
+    }
+    /**
+     * decrement invincibility frame counter and cancels invincibility status if appropriate
+     * 
+     */
+    decrementInvincibilityFrameCount() {
+        if (this.#framesOfInvincibilityLeft <= 0 && !this.#isInvicible) {
+            return;
+        }
+        if (this.#framesOfInvincibilityLeft <= 0) {
+            this.#framesOfInvincibilityLeft = 0;
+            this.setIsInvicible(false);
+            return;
+        }
+        this.#framesOfInvincibilityLeft --;
     }
     /**
      * 
@@ -108,5 +131,25 @@ export class Player extends Actor {
         this.positions.posX -= this.moveSpeed.x * speedFactor;
         this.setBoundaries();
         this.setFacedDirection(false);
+    }
+    toggleInvincibilityFrameAnimation() {
+        this.#isInvicible ?
+            this.domElement.sprite.classList.add("invincible")
+            : this.domElement.sprite.classList.remove("invincible")
+    }
+    takeHit(damageReceived) {
+        if (!this.#isInvicible) {
+            this.setHealth(this.getHealth() - damageReceived);
+            if (this.isAlive()) {
+                this.setIsInvicible(true)
+            }
+        }
+    }
+    resetToInitialState() {
+        this.clearAllProjectiles();
+        this.#framesOfInvincibilityLeft = 0;
+        this.setIsInvicible(false);
+        this.setFacedDirection(true)
+        this.restoreToFullHealth();
     }
 }

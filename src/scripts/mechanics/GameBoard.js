@@ -86,8 +86,7 @@ export class GameBoard {
             enemy = null;
         }
         this.enemies.clear();
-        this.player.clearAllProjectiles();
-        this.player.restoreToFullHealth();
+        this.player.resetToInitialState()
         this.respawnPlayer();
     }
     /**

@@ -12,6 +12,12 @@
     }
 }
 
+.invincible {
+    animation-name: blinking;
+    animation-duration: .5s;
+    animation-iteration-count: infinite;
+}
+
 .sprite {
     position: absolute;
     object-fit: cover;

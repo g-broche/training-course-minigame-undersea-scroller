@@ -184,7 +184,6 @@ export class App {
         window.addEventListener("keydown", (e) => {
             // disable default browser events on game keys to not conflict with gameplay
             if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "Enter", "Space"].includes(e.code)) {
-                console.log("prevented")
                 e.preventDefault();
             }
             if (!this.#isInitialized || this.#isModalOpen === true) {
@@ -230,6 +229,7 @@ export class App {
      * action to execute for each frame and will call itself when requesting new frame unless game is paused
      */
     playFrame() {
+        this.player.decrementInvincibilityFrameCount()
         this.reloadNextSpawn();
         this.player.reloadNextShot();
         this.consumeActions();
@@ -239,6 +239,9 @@ export class App {
         this.handleEnemyActions()
         this.handleEnemiesProjectileActions()
         this.handleEnemySpawn()
+        if (!this.player.isAlive()) {
+            this.handleGameOver();
+        }
         if (this.#isPlaying && !this.#isPaused) {
             this.#frameRequestId = window.requestAnimationFrame(() => { this.playFrame() });
         }
@@ -310,9 +313,6 @@ export class App {
                 if (projectile.hasCollisionWith(this.player)) {
                     this.player.takeHit(projectile.damage)
                     this.queueProjectileForDeletion({ projectileId: projectileId, projectile: projectile })
-                    if (!this.player.isAlive()) {
-                        this.handleGameOver();
-                    }
                 }
                 if (this.gameBoard.isOutOfBounds(projectile)) {
                     this.queueProjectileForDeletion({ projectileId: projectileId, projectile: projectile })
@@ -327,6 +327,9 @@ export class App {
     handleEnemyActions() {
         for (const [enemyId, enemy] of this.gameBoard.enemies) {
             enemy.reloadNextShot()
+            if (enemy.hasCollisionWith(this.player)) {
+                this.player.takeHit(enemy.getDamageOnContact())
+            }
             if (this.gameBoard.isPlayerLeftFromEnemy(enemy)) {
                 enemy.setFacedDirection(false)
             } else {

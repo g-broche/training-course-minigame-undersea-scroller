@@ -5,6 +5,7 @@ import { Actor } from "./Actor.js";
 export class Enemy extends Actor {
     static enemyIncrementor = 1;
     #pointValue;
+    #damageOnContact = 25;
     get isPlayer() { return false }
     get getProjectileSizeRatio() { throw new Error("children classes must implement projectileSizeRatio getter") }
     constructor({
@@ -39,6 +40,10 @@ export class Enemy extends Actor {
 
     getSpeedFactor() {
         throw new Error("Method 'getSpeedFactor' must be implemented by children classes")
+    }
+
+    getDamageOnContact() {
+        return this.#damageOnContact;
     }
 
     /**
