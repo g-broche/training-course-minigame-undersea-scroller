@@ -4,9 +4,9 @@
 export class Controller {
     static #instance = null
     KeyMapping = [
-        { action: "moveUp", keys: new Set(["KeyZ", "ArrowUp"]) },
+        { action: "moveUp", keys: new Set(["KeyW", "ArrowUp"]) },
         { action: "moveDown", keys: new Set(["KeyS", "ArrowDown"]) },
-        { action: "moveLeft", keys: new Set(["KeyQ", "ArrowLeft"]) },
+        { action: "moveLeft", keys: new Set(["KeyA", "ArrowLeft"]) },
         { action: "moveRight", keys: new Set(["KeyD", "ArrowRight"]) },
         { action: "fire", keys: new Set(["Space", "Enter"]) },
     ]
