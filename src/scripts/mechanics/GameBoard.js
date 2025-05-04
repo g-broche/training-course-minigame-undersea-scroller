@@ -129,6 +129,7 @@ export class GameBoard {
      * respawn player to initial start position and restart animation
      */
     respawnPlayer() {
+        this.player.setSize(this)
         this.player.setPosition({ posX: this.player.sizes.halfWidth, posY: this.sizes.height / 2 });
         this.player.ActualizeDisplayLocation();
         this.player.toggleVisibility(true)

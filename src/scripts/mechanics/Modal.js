@@ -100,4 +100,21 @@ export class Modal {
     removeContent() {
         this.domElements.content.remove();
     }
+
+    /**
+     * creates dom content intended to be displayed in the modal on defeat
+     */
+    createGameOverWindowContent({ score, defeatedEnemies, timeString }) {
+        const title = document.createElement("h2");
+        title.textContent = "GAME OVER"
+        const messageOverElement = document.createElement("p");
+        const messageTime = `You survived for ${timeString}`
+        const messageEnemyCount = `defeated ${defeatedEnemies} enemies`
+        const messageScore = `reaching a total score of ${score} points`
+        const message = `${messageTime} and ${messageEnemyCount} ${messageScore}.`
+        messageOverElement.textContent = message;
+        const messageInstructionElement = document.createElement("p");
+        messageInstructionElement.textContent = "Close the window and press any button to start a new game"
+        this.domElements.contentWrapper.append(title, messageOverElement, messageInstructionElement)
+    }
 }

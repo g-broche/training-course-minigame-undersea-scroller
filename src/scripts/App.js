@@ -353,26 +353,6 @@ export class App {
         projectile.owner.addShotsToDespawner(projectileId);
         projectile = null;
     }
-    /**
-     * creates dom content intended to be displayed in the modal on defeat
-     * @returns {HTMLDivElement}
-     */
-    createGameOverWindowContent() {
-        const contentWrapper = document.createElement("div");
-        contentWrapper.className = "game-over-content";
-        const title = document.createElement("h2");
-        title.textContent = "GAME OVER"
-        const messageOverElement = document.createElement("p");
-        const messageTime = `You survived for ${this.scoreBoard.getSurvivedTimeString()}`
-        const messageEnemyCount = `defeated ${this.scoreBoard.getDefeatedEnemyCount()} enemies`
-        const messageScore = `reaching a total score of ${this.scoreBoard.getScore()} points`
-        const message = `${messageTime} and ${messageEnemyCount} ${messageScore}.`
-        messageOverElement.textContent = message;
-        const messageInstructionElement = document.createElement("p");
-        messageInstructionElement.textContent = "Close the window and press any button to start a new game"
-        contentWrapper.append(title, messageOverElement, messageInstructionElement)
-        return contentWrapper;
-    }
 
     /**
      * Handle methods call related to game over logic
@@ -382,7 +362,11 @@ export class App {
         this.setIsPlaying(false);
         this.scoreBoard.stopClock();
         this.#isModalOpen = true;
-        this.modal.appendContent(this.createGameOverWindowContent());
+        this.modal.createGameOverWindowContent({
+            timeString: this.scoreBoard.getSurvivedTimeString(),
+            defeatedEnemies: this.scoreBoard.getDefeatedEnemyCount(),
+            score: this.scoreBoard.getScore(),
+        });
         this.modal.show();
     }
 
