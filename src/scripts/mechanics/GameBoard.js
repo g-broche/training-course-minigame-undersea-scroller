@@ -131,6 +131,10 @@ export class GameBoard {
     respawnPlayer() {
         this.player.setSize(this)
         this.player.setPosition({ posX: this.player.sizes.halfWidth, posY: this.sizes.height / 2 });
+        this.player.setSpeed({
+            moveSpeedX: this.moveSpeedBase,
+            moveSpeedY: this.moveSpeedBase / 2
+        })
         this.player.ActualizeDisplayLocation();
         this.player.toggleVisibility(true)
         this.player.startAnimation()

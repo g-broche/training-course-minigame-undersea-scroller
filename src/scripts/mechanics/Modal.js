@@ -99,14 +99,17 @@ export class Modal {
      */
     removeContent() {
         this.domElements.content.remove();
+        this.domElements.content.innerHTML = "";
     }
 
     /**
      * creates dom content intended to be displayed in the modal on defeat
      */
     createGameOverWindowContent({ score, defeatedEnemies, timeString }) {
+        const gameOverComponent = document.createElement("div");
+        gameOverComponent.className = "game-over-window";
         const title = document.createElement("h2");
-        title.textContent = "GAME OVER"
+        title.textContent = "GAME OVER";
         const messageOverElement = document.createElement("p");
         const messageTime = `You survived for ${timeString}`
         const messageEnemyCount = `defeated ${defeatedEnemies} enemies`
@@ -115,6 +118,7 @@ export class Modal {
         messageOverElement.textContent = message;
         const messageInstructionElement = document.createElement("p");
         messageInstructionElement.textContent = "Close the window and press any button to start a new game"
-        this.domElements.contentWrapper.append(title, messageOverElement, messageInstructionElement)
+        gameOverComponent.append(title, messageOverElement, messageInstructionElement);
+        this.appendContent(gameOverComponent);
     }
 }
